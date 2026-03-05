@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopnest/components/browsemycategory_section.dart';
 import 'package:shopnest/components/howitwork_section.dart';
+import 'package:shopnest/components/shopfooter_section.dart';
 import 'package:shopnest/components/stats_section.dart';
 import 'package:shopnest/components/trendingcollection_section.dart';
 
@@ -296,6 +297,8 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 7),
                 HowItWorksSection(),
+                const SizedBox(height: 20),
+                ShopFooter(),
               ],
             ),
           ),
