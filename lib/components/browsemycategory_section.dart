@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'browsemycategory_card.dart';
 
@@ -83,7 +84,8 @@ class _BrowsemycategorySectionState extends State<BrowsemycategorySection> {
             child: BrowsemycategoryCard(
               item: item,
               onPressed: () {
-                print("Clicked ${item['title']}");
+                Get.toNamed("/rentclothes");
+                //print("Clicked ${item['title']}");
               },
             ),
           );

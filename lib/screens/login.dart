@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // import 'package:new_app/data/services/authentication_service.dart';
 import 'package:shopnest/components/custom_snackbar.dart';
+import 'package:shopnest/components/main_layout_drawer.dart';
 
 class ShopNestLogin extends StatefulWidget {
   const ShopNestLogin({super.key});
@@ -78,9 +79,9 @@ class _ShopNestLoginState extends State<ShopNestLogin> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      backgroundColor: const Color(0xfff4f4f4),
-      body: Stack(
+    return MainLayout(
+      //backgroundColor: const Color(0xfff4f4f4),
+      child: Stack(
         children: [
           Center(
             child: SingleChildScrollView(
@@ -88,7 +89,9 @@ class _ShopNestLoginState extends State<ShopNestLogin> {
               child: Container(
                 width: width > 600 ? 450 : double.infinity,
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 24, vertical: 30),
+                  horizontal: 24,
+                  vertical: 30,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(28),
@@ -97,7 +100,7 @@ class _ShopNestLoginState extends State<ShopNestLogin> {
                       color: Colors.black.withOpacity(0.05),
                       blurRadius: 20,
                       spreadRadius: 5,
-                    )
+                    ),
                   ],
                 ),
                 child: Column(
@@ -124,10 +127,7 @@ class _ShopNestLoginState extends State<ShopNestLogin> {
 
                     const Text(
                       "Login to your ShopNest account",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 15,
-                      ),
+                      style: TextStyle(color: Colors.grey, fontSize: 15),
                     ),
 
                     const SizedBox(height: 30),
@@ -222,7 +222,7 @@ class _ShopNestLoginState extends State<ShopNestLogin> {
                           ],
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -261,16 +261,18 @@ class _ShopNestLoginState extends State<ShopNestLogin> {
             prefixIcon: Icon(icon),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide:
-              BorderSide(color: error ? Colors.red : Colors.grey),
+              borderSide: BorderSide(color: error ? Colors.red : Colors.grey),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide:
-              BorderSide(color: error ? Colors.red : Colors.deepOrange),
+              borderSide: BorderSide(
+                color: error ? Colors.red : Colors.deepOrange,
+              ),
             ),
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
           ),
         ),
       ],
@@ -281,8 +283,7 @@ class _ShopNestLoginState extends State<ShopNestLogin> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Password",
-            style: TextStyle(fontWeight: FontWeight.w600)),
+        const Text("Password", style: TextStyle(fontWeight: FontWeight.w600)),
         const SizedBox(height: 6),
         TextField(
           controller: _passwordController,
@@ -291,9 +292,11 @@ class _ShopNestLoginState extends State<ShopNestLogin> {
             hintText: "Enter your password",
             prefixIcon: const Icon(Icons.lock),
             suffixIcon: IconButton(
-              icon: Icon(_obscurePassword
-                  ? Icons.visibility_outlined
-                  : Icons.visibility_off_outlined),
+              icon: Icon(
+                _obscurePassword
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
+              ),
               onPressed: () {
                 setState(() {
                   _obscurePassword = !_obscurePassword;
@@ -302,16 +305,20 @@ class _ShopNestLoginState extends State<ShopNestLogin> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide:
-              BorderSide(color: passwordError ? Colors.red : Colors.grey),
+              borderSide: BorderSide(
+                color: passwordError ? Colors.red : Colors.grey,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide:
-              BorderSide(color: passwordError ? Colors.red : Colors.deepOrange),
+              borderSide: BorderSide(
+                color: passwordError ? Colors.red : Colors.deepOrange,
+              ),
             ),
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
           ),
         ),
       ],

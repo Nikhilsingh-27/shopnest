@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopnest/components/browsemycategory_section.dart';
 import 'package:shopnest/components/howitwork_section.dart';
+import 'package:shopnest/components/main_layout_drawer.dart';
 import 'package:shopnest/components/shopfooter_section.dart';
 import 'package:shopnest/components/stats_section.dart';
 import 'package:shopnest/components/trendingcollection_section.dart';
@@ -14,127 +15,13 @@ class HomeScreen extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     final bool isMobile = width < 700;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFf9f9f9),
-
-      /// DRAWER
-      endDrawer: Drawer(
-        backgroundColor: const Color(0xFF243447),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-
-                _drawerItem(Icons.home, "Home", "/home"),
-                _drawerItem(Icons.checkroom, "Rent Clothes", "/rent"),
-                _drawerItem(Icons.local_offer, "Categories", "/categories"),
-                _drawerItem(Icons.shopping_cart, "Cart", "/cart"),
-                _drawerItem(Icons.login, "Login", "/login"),
-
-                const Spacer(),
-
-                /// SIGN UP BUTTON
-                InkWell(
-                  onTap: () {
-                    Get.back();
-                    Get.toNamed("/signup");
-                  },
-                  borderRadius: BorderRadius.circular(40),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFF7A45),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.person, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          "Sign Up Free",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
-        ),
-      ),
-
+    return MainLayout(
       /// BODY
-      body: SafeArea(
+      child: SafeArea(
         child: Builder(
           builder: (context) => SingleChildScrollView(
             child: Column(
               children: [
-                /// NAVBAR
-                Container(
-                  height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF243447),
-                    border: Border(
-                      bottom: BorderSide(color: Colors.white24, width: 1),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      /// LOGO
-                      Row(
-                        children: const [
-                          Icon(
-                            Icons.checkroom,
-                            color: Color(0xFFFF7A45),
-                            size: 32,
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            "ShopNest",
-                            style: TextStyle(
-                              color: Color(0xFFFF7A45),
-                              fontSize: 26,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      /// MENU BUTTON
-                      InkWell(
-                        onTap: () {
-                          Scaffold.of(context).openEndDrawer();
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white24),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Icon(
-                            Icons.menu,
-                            color: Colors.white70,
-                            size: 26,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
                 /// HERO SECTION
                 Container(
                   height: 500,
@@ -192,7 +79,9 @@ class HomeScreen extends StatelessWidget {
 
                             /// PRIMARY BUTTON
                             InkWell(
-                              onTap: () {},
+                              onTap: () {
+                                Get.toNamed("/rentclothes");
+                              },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 30,
@@ -287,6 +176,39 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 const TrendingcollectionSection(),
+                const SizedBox(height: 5),
+                Container(
+                  width: 200,
+                  margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.toNamed("/rentclothes");
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orangeAccent,
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 3,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.shopping_bag, size: 22, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text(
+                          "View All Collection",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
 
                 const SizedBox(height: 7),
                 StatsSection(),

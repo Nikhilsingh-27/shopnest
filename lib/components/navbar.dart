@@ -16,9 +16,7 @@ class ShopNestNavbar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: const BoxDecoration(
         color: Color(0xFF243447), // dark blue background
-        border: Border(
-          bottom: BorderSide(color: Colors.white24, width: 1),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.white24, width: 1)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -26,8 +24,7 @@ class ShopNestNavbar extends StatelessWidget {
           /// LEFT — LOGO
           Row(
             children: const [
-              Icon(Icons.checkroom,
-                  color: Color(0xFFFF7A45), size: 30),
+              Icon(Icons.checkroom, color: Color(0xFFFF7A45), size: 30),
               SizedBox(width: 10),
               Text(
                 "ShopNest",
@@ -56,15 +53,16 @@ class ShopNestNavbar extends StatelessWidget {
                 /// SIGN UP BUTTON
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 12),
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFF7A45),
                     borderRadius: BorderRadius.circular(28),
                   ),
                   child: Row(
                     children: const [
-                      Icon(Icons.person_add,
-                          color: Colors.white, size: 18),
+                      Icon(Icons.person_add, color: Colors.white, size: 18),
                       SizedBox(width: 8),
                       Text(
                         "Sign Up Free",
@@ -81,7 +79,21 @@ class ShopNestNavbar extends StatelessWidget {
 
           /// MOBILE MENU ICON
           if (isMobile)
-            const Icon(Icons.menu, color: Colors.white, size: 28),
+            Builder(
+              builder: (context) => InkWell(
+                onTap: () {
+                  Scaffold.of(context).openEndDrawer();
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white24),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.menu, color: Colors.white, size: 26),
+                ),
+              ),
+            ),
         ],
       ),
     );

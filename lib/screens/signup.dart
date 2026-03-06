@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // import 'package:new_app/data/services/authentication_service.dart';
 import 'package:shopnest/components/custom_snackbar.dart';
+import 'package:shopnest/components/main_layout_drawer.dart';
 
 class ShopNestSignup extends StatefulWidget {
   const ShopNestSignup({super.key});
@@ -17,7 +18,7 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
-  TextEditingController();
+      TextEditingController();
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -144,9 +145,9 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      backgroundColor: const Color(0xfff4f4f4),
-      body: Stack(
+    return MainLayout(
+      //backgroundColor: const Color(0xfff4f4f4),
+      child: Stack(
         children: [
           Center(
             child: SingleChildScrollView(
@@ -162,7 +163,7 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
                       color: Colors.black.withOpacity(0.05),
                       blurRadius: 15,
                       spreadRadius: 5,
-                    )
+                    ),
                   ],
                 ),
                 child: Column(
@@ -172,8 +173,11 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
                     const Center(
                       child: Column(
                         children: [
-                          Icon(Icons.person_add_alt_1,
-                              size: 60, color: Colors.deepOrange),
+                          Icon(
+                            Icons.person_add_alt_1,
+                            size: 60,
+                            color: Colors.deepOrange,
+                          ),
                           SizedBox(height: 12),
                           Text(
                             "Join ShopNest Rentals",
@@ -194,51 +198,59 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
                     const SizedBox(height: 30),
 
                     _buildTextField(
-                        "Full Name",
-                        "Enter your full name",
-                        _nameController,
-                        nameError,
-                        Icons.person),
+                      "Full Name",
+                      "Enter your full name",
+                      _nameController,
+                      nameError,
+                      Icons.person,
+                    ),
 
                     _buildTextField(
-                        "Email",
-                        "Enter your email",
-                        _emailController,
-                        emailError,
-                        Icons.email),
+                      "Email",
+                      "Enter your email",
+                      _emailController,
+                      emailError,
+                      Icons.email,
+                    ),
 
                     _buildTextField(
-                        "Phone Number",
-                        "Enter phone number",
-                        _phoneController,
-                        phoneError,
-                        Icons.phone),
+                      "Phone Number",
+                      "Enter phone number",
+                      _phoneController,
+                      phoneError,
+                      Icons.phone,
+                    ),
 
                     _buildTextField(
-                        "Delivery Address",
-                        "Enter your complete address for delivery",
-                        _addressController,
-                        addressError,
-                        Icons.home,
-                        maxLines: 3),
+                      "Delivery Address",
+                      "Enter your complete address for delivery",
+                      _addressController,
+                      addressError,
+                      Icons.home,
+                      maxLines: 3,
+                    ),
 
                     _buildPasswordField(
-                        "Password",
-                        "Create password",
-                        _passwordController,
-                        passwordError,
-                        _obscurePassword,
-                            () => setState(
-                                () => _obscurePassword = !_obscurePassword)),
+                      "Password",
+                      "Create password",
+                      _passwordController,
+                      passwordError,
+                      _obscurePassword,
+                      () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
+                    ),
 
                     _buildPasswordField(
-                        "Confirm Password",
-                        "Confirm password",
-                        _confirmPasswordController,
-                        confirmPasswordError,
-                        _obscureConfirmPassword,
-                            () => setState(() => _obscureConfirmPassword =
-                        !_obscureConfirmPassword)),
+                      "Confirm Password",
+                      "Confirm password",
+                      _confirmPasswordController,
+                      confirmPasswordError,
+                      _obscureConfirmPassword,
+                      () => setState(
+                        () =>
+                            _obscureConfirmPassword = !_obscureConfirmPassword,
+                      ),
+                    ),
 
                     const SizedBox(height: 20),
 
@@ -256,13 +268,16 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
                             children: [
                               Icon(Icons.star, size: 18),
                               SizedBox(width: 8),
-                              Text("Why Rent with Us?",
-                                  style:
-                                  TextStyle(fontWeight: FontWeight.bold)),
+                              Text(
+                                "Why Rent with Us?",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ],
                           ),
                           SizedBox(height: 10),
-                          Text("✓ Rent designer clothes at 10% of retail price"),
+                          Text(
+                            "✓ Rent designer clothes at 10% of retail price",
+                          ),
                           Text("✓ Free delivery & pickup"),
                           Text("✓ Professional dry cleaning included"),
                           Text("✓ Flexible rental periods"),
@@ -288,10 +303,10 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
                           child: Text(
                             "I agree to the Rental Terms & Conditions",
                             style: TextStyle(
-                                color:
-                                termsError ? Colors.red : Colors.black87),
+                              color: termsError ? Colors.red : Colors.black87,
+                            ),
                           ),
-                        )
+                        ),
                       ],
                     ),
 
@@ -303,8 +318,10 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
                       child: ElevatedButton.icon(
                         onPressed: _handleSignup,
                         icon: const Icon(Icons.person_add),
-                        label: const Text("Create Account",
-                            style: TextStyle(fontSize: 16)),
+                        label: const Text(
+                          "Create Account",
+                          style: TextStyle(fontSize: 16),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.deepOrange,
                           foregroundColor: Colors.white,
@@ -326,15 +343,17 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
                             text: "Already have an account? ",
                             children: [
                               TextSpan(
-                                  text: "Login here",
-                                  style: TextStyle(
-                                      color: Colors.deepOrange,
-                                      fontWeight: FontWeight.bold))
+                                text: "Login here",
+                                style: TextStyle(
+                                  color: Colors.deepOrange,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -347,16 +366,21 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
               child: const Center(
                 child: CircularProgressIndicator(color: Colors.white),
               ),
-            )
+            ),
         ],
       ),
     );
   }
 
   /// ================= COMMON TEXT FIELD =================
-  Widget _buildTextField(String label, String hint,
-      TextEditingController controller, bool error, IconData icon,
-      {int maxLines = 1}) {
+  Widget _buildTextField(
+    String label,
+    String hint,
+    TextEditingController controller,
+    bool error,
+    IconData icon, {
+    int maxLines = 1,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
       child: Column(
@@ -372,16 +396,18 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
               prefixIcon: Icon(icon),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide:
-                BorderSide(color: error ? Colors.red : Colors.grey),
+                borderSide: BorderSide(color: error ? Colors.red : Colors.grey),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide:
-                BorderSide(color: error ? Colors.red : Colors.deepOrange),
+                borderSide: BorderSide(
+                  color: error ? Colors.red : Colors.deepOrange,
+                ),
               ),
-              contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
             ),
           ),
         ],
@@ -390,12 +416,13 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
   }
 
   Widget _buildPasswordField(
-      String label,
-      String hint,
-      TextEditingController controller,
-      bool error,
-      bool obscure,
-      VoidCallback toggle) {
+    String label,
+    String hint,
+    TextEditingController controller,
+    bool error,
+    bool obscure,
+    VoidCallback toggle,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
       child: Column(
@@ -410,23 +437,27 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
               hintText: hint,
               prefixIcon: const Icon(Icons.lock),
               suffixIcon: IconButton(
-                icon: Icon(obscure
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined),
+                icon: Icon(
+                  obscure
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                ),
                 onPressed: toggle,
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide:
-                BorderSide(color: error ? Colors.red : Colors.grey),
+                borderSide: BorderSide(color: error ? Colors.red : Colors.grey),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide:
-                BorderSide(color: error ? Colors.red : Colors.deepOrange),
+                borderSide: BorderSide(
+                  color: error ? Colors.red : Colors.deepOrange,
+                ),
               ),
-              contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
             ),
           ),
         ],

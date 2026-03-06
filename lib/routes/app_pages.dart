@@ -1,6 +1,9 @@
 import 'package:get/get.dart';
 import 'package:shopnest/screens/forgot.dart';
+import 'package:shopnest/screens/profile_screen.dart';
+import 'package:shopnest/screens/rentclothes_screen.dart';
 import 'package:shopnest/screens/signup.dart';
+
 import '../screens/homescreen.dart';
 // import '../screens/rent_screen.dart';
 // import '../screens/categories_screen.dart';
@@ -18,9 +21,8 @@ class AppPages {
     // GetPage(name: Routes.cart, page: () => const CartScreen()),
     GetPage(name: Routes.login, page: () => const ShopNestLogin()),
     GetPage(name: Routes.signup, page: () => const ShopNestSignup()),
-    GetPage(
-      name: Routes.forgot,
-      page: () => const ForgotPasswordScreen(),
-    ),
+    GetPage(name: Routes.forgot, page: () => const ForgotPasswordScreen()),
+    GetPage(name: Routes.rentclothes, page: () => RentclothesScreen()),
+    GetPage(name: Routes.profile, page: () => ProfileScreen()),
   ];
 }

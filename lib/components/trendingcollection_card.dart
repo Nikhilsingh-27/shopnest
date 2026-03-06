@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shopnest/screens/singleproduct_screen.dart';
 
 class TrendingcollectionCard extends StatelessWidget {
   final Map<String, dynamic> item;
@@ -98,7 +100,9 @@ class TrendingcollectionCard extends StatelessWidget {
                   width: double.infinity,
                   height: 46,
                   child: OutlinedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.to(SingleproductScreen(item: item));
+                    },
                     icon: const Icon(Icons.remove_red_eye_outlined),
                     label: const Text("View Details"),
                   ),
