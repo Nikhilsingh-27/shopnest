@@ -135,7 +135,31 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
                         color: Colors.green,
                       ),
                     ),
-
+                    SizedBox(height: 10),
+                    Text(
+                      "Beautiful traditional red silk saree with zari work",
+                      style: const TextStyle(fontSize: 18, color: Colors.black),
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      width: 150,
+                      color: Colors.green,
+                      child: Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: Row(
+                          children: [
+                            Icon(Icons.check, color: Colors.white),
+                            SizedBox(width: 3),
+                            Text(
+                              "Available for Rent",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text("Only 2 left in stock"),
                     const SizedBox(height: 20),
 
                     /// QUANTITY SELECTOR
@@ -187,7 +211,6 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
                     /// ADD TO CART BUTTON
                     Row(
                       children: [
-
                         /// ADD TO CART
                         Expanded(
                           child: SizedBox(
@@ -218,10 +241,16 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
                             height: 50,
                             child: OutlinedButton.icon(
                               onPressed: () {},
-                              icon: const Icon(Icons.favorite, color: Colors.red),
+                              icon: const Icon(
+                                Icons.favorite,
+                                color: Colors.red,
+                              ),
                               label: const Text(
                                 "Add to Wishlist",
-                                style: TextStyle(fontSize: 16, color: Colors.red),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.red,
+                                ),
                               ),
                               style: OutlinedButton.styleFrom(
                                 side: const BorderSide(color: Colors.red),
@@ -238,23 +267,47 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
                     const SizedBox(height: 30),
 
                     /// DESCRIPTION
-                    const Text(
-                      "Product Description",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          /// Title Row
+                          Row(
+                            children: const [
+                              Icon(Icons.info_outline, size: 22),
+                              SizedBox(width: 8),
+                              Text(
+                                "Rental Information",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          /// Bullet Points
+                          buildBullet("Free delivery & pickup included"),
+                          buildBullet(
+                            "Professional dry cleaning after every use",
+                          ),
+                          buildBullet("Flexible rental periods (3–14 days)"),
+                          buildBullet(
+                            "Quality check & ironing before delivery",
+                          ),
+                          buildBullet("Easy cancellation policy"),
+                        ],
                       ),
                     ),
-
-                    const SizedBox(height: 10),
-
-                    const Text(
-                      "This designer outfit is perfect for weddings, parties, and special occasions. "
-                      "Made with high quality fabric and elegant design to give you a premium look. "
-                      "Rent it for your special day and enjoy luxury fashion at an affordable price.",
-                      style: TextStyle(fontSize: 15, height: 1.5),
-                    ),
-
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -357,5 +410,24 @@ Widget detailsRow(String title, String value, {Color? valueColor}) {
         style: TextStyle(fontSize: 16, color: valueColor ?? Colors.black87),
       ),
     ],
+  );
+}
+
+Widget buildBullet(String text) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("•", style: TextStyle(fontSize: 18)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(fontSize: 15, color: Colors.black87),
+          ),
+        ),
+      ],
+    ),
   );
 }
