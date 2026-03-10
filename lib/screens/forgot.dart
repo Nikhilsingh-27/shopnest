@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopnest/components/custom_snackbar.dart';
+import 'package:shopnest/components/main_layout_drawer.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -47,145 +48,147 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      backgroundColor: const Color(0xfff4f4f4),
-      body: Stack(
-        children: [
-          Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Container(
-                width: width > 600 ? 480 : double.infinity,
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(28),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    _buildStepper(activeStep: 1),
-
-                    const SizedBox(height: 25),
-
-                    const Icon(Icons.key,
-                        size: 60, color: Colors.deepOrange),
-
-                    const SizedBox(height: 15),
-
-                    const Text("Forgot Password",
-                        style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold)),
-
-                    const SizedBox(height: 6),
-
-                    const Text(
-                      "Enter your email to reset password",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-
-                    const SizedBox(height: 30),
-
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text("Email Address",
+    return MainLayout(
+      child: Scaffold(
+        backgroundColor: const Color(0xfff4f4f4),
+        body: Stack(
+          children: [
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Container(
+                  width: width > 600 ? 480 : double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _buildStepper(activeStep: 1),
+      
+                      const SizedBox(height: 25),
+      
+                      const Icon(Icons.key,
+                          size: 60, color: Colors.deepOrange),
+      
+                      const SizedBox(height: 15),
+      
+                      const Text("Forgot Password",
                           style: TextStyle(
-                              fontWeight: FontWeight.w600)),
-                    ),
-                    const SizedBox(height: 6),
-
-                    TextField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        hintText: "Enter your registered email",
-                        prefixIcon: const Icon(Icons.email),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius:
-                          BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                              color: emailError
-                                  ? Colors.red
-                                  : Colors.grey),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius:
-                          BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                              color: emailError
-                                  ? Colors.red
-                                  : Colors.deepOrange),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "We'll generate a password reset link for you",
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold)),
+      
+                      const SizedBox(height: 6),
+      
+                      const Text(
+                        "Enter your email to reset password",
                         style: TextStyle(color: Colors.grey),
                       ),
-                    ),
-
-                    const SizedBox(height: 25),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: _generateLink,
-                        icon: const Icon(Icons.send),
-                        label: const Text(
-                          "Generate Reset Link",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepOrange,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 18),
-                          shape: RoundedRectangleBorder(
+      
+                      const SizedBox(height: 30),
+      
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text("Email Address",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600)),
+                      ),
+                      const SizedBox(height: 6),
+      
+                      TextField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          hintText: "Enter your registered email",
+                          prefixIcon: const Icon(Icons.email),
+                          enabledBorder: OutlineInputBorder(
                             borderRadius:
-                            BorderRadius.circular(40),
+                            BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                                color: emailError
+                                    ? Colors.red
+                                    : Colors.grey),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius:
+                            BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                                color: emailError
+                                    ? Colors.red
+                                    : Colors.deepOrange),
                           ),
                         ),
                       ),
-                    ),
-
-                    const SizedBox(height: 25),
-
-                    GestureDetector(
-                      onTap: () => Get.back(),
-                      child: const Text.rich(
-                        TextSpan(
-                          text: "Remember your password? ",
-                          children: [
-                            TextSpan(
-                                text: "Back to Login",
-                                style: TextStyle(
-                                    color: Colors.deepOrange,
-                                    fontWeight:
-                                    FontWeight.bold))
-                          ],
+      
+                      const SizedBox(height: 10),
+      
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "We'll generate a password reset link for you",
+                          style: TextStyle(color: Colors.grey),
                         ),
                       ),
-                    )
-                  ],
+      
+                      const SizedBox(height: 25),
+      
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: _generateLink,
+                          icon: const Icon(Icons.send),
+                          label: const Text(
+                            "Generate Reset Link",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepOrange,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 18),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                              BorderRadius.circular(40),
+                            ),
+                          ),
+                        ),
+                      ),
+      
+                      const SizedBox(height: 25),
+      
+                      GestureDetector(
+                        onTap: () => Get.back(),
+                        child: const Text.rich(
+                          TextSpan(
+                            text: "Remember your password? ",
+                            children: [
+                              TextSpan(
+                                  text: "Back to Login",
+                                  style: TextStyle(
+                                      color: Colors.deepOrange,
+                                      fontWeight:
+                                      FontWeight.bold))
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-
-          if (isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.4),
-              child: const Center(
-                child:
-                CircularProgressIndicator(color: Colors.white),
-              ),
-            )
-        ],
+      
+            if (isLoading)
+              Container(
+                color: Colors.black.withOpacity(0.4),
+                child: const Center(
+                  child:
+                  CircularProgressIndicator(color: Colors.white),
+                ),
+              )
+          ],
+        ),
       ),
     );
   }

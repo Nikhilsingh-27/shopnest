@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shopnest/screens/signup.dart';
 
 class MainLayout extends StatelessWidget {
   final Widget child;
@@ -75,7 +76,33 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
               _menuItem(Icons.checkroom, "Rent Clothes", "/rentclothes"),
               _menuItem(Icons.local_offer, "Categories", "/categories"),
               _menuItem(Icons.shopping_cart, "Cart", "/cart"),
-
+              _menuItem(Icons.login, "Login", "/login"),
+              SizedBox(height: 8,),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Get.to(ShopNestSignup());
+                  },
+                  icon: const Icon(Icons.person_add_alt_1, color: Colors.white,fontWeight: FontWeight.bold,),
+                  label: const Text(
+                    "Sign Up Free",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFFF7A45), // orange color
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    elevation: 0,
+                  ),
+                ),
+              ),
               const SizedBox(height: 30),
 
               /// PROFILE ROW

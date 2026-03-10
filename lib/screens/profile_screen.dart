@@ -56,6 +56,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       "finalPrice": 2560,
     },
   ];
+
+
   String selectedMenu = "Profile";
   @override
   Widget build(BuildContext context) {
@@ -391,184 +393,184 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
 
-                                const SizedBox(height: 20),
-
-                                /// RENTAL SUMMARY CARD
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(25),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xff6a7bd1),
-                                        Color(0xff7a4fa3),
-                                      ],
-                                    ),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      /// TITLE
-                                      const Row(
-                                        children: [
-                                          Icon(
-                                            Icons.receipt_long,
-                                            color: Colors.white,
-                                            size: 28,
-                                          ),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            "Rental Summary",
-                                            style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-                                      const SizedBox(height: 30),
-
-                                      /// PRICE ROWS
-                                      _priceRow("Rental Subtotal:", "₹729.00"),
-                                      const SizedBox(height: 12),
-
-                                      _priceRow("Delivery Charge:", "₹99.00"),
-                                      const SizedBox(height: 12),
-
-                                      _priceRow("Tax (18% GST):", "₹131.22"),
-
-                                      const SizedBox(height: 20),
-
-                                      const Divider(color: Colors.white54),
-
-                                      const SizedBox(height: 15),
-
-                                      /// TOTAL
-                                      const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            "Total Payable:",
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          Text(
-                                            "₹959.22",
-                                            style: TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-                                      const SizedBox(height: 30),
-
-                                      /// CHECKOUT BUTTON
-                                      SizedBox(
-                                        width: double.infinity,
-                                        height: 50,
-                                        child: ElevatedButton.icon(
-                                          onPressed: () {},
-                                          icon: const Icon(Icons.credit_card),
-                                          label: const Text(
-                                            "Proceed to Checkout",
-                                            style: TextStyle(fontSize: 18),
-                                          ),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.white,
-                                            foregroundColor: Colors.black,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                const SizedBox(height: 25),
-
-                                /// RENTAL POLICIES CARD
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(20),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
-                                  child: const Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(Icons.shield_outlined),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            "Rental Policies",
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-                                      SizedBox(height: 15),
-
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.check,
-                                            color: Colors.green,
-                                          ),
-                                          SizedBox(width: 10),
-                                          Text("Free pickup after rental"),
-                                        ],
-                                      ),
-
-                                      SizedBox(height: 10),
-
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.check,
-                                            color: Colors.green,
-                                          ),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            "Professional cleaning included",
-                                          ),
-                                        ],
-                                      ),
-
-                                      SizedBox(height: 10),
-
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.check,
-                                            color: Colors.green,
-                                          ),
-                                          SizedBox(width: 10),
-                                          Text("Easy cancellation"),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                // const SizedBox(height: 20),
+                                //
+                                // /// RENTAL SUMMARY CARD
+                                // Container(
+                                //   width: double.infinity,
+                                //   padding: const EdgeInsets.all(25),
+                                //   decoration: BoxDecoration(
+                                //     borderRadius: BorderRadius.circular(25),
+                                //     gradient: const LinearGradient(
+                                //       colors: [
+                                //         Color(0xff6a7bd1),
+                                //         Color(0xff7a4fa3),
+                                //       ],
+                                //     ),
+                                //   ),
+                                //   child: Column(
+                                //     crossAxisAlignment:
+                                //         CrossAxisAlignment.start,
+                                //     children: [
+                                //       /// TITLE
+                                //       const Row(
+                                //         children: [
+                                //           Icon(
+                                //             Icons.receipt_long,
+                                //             color: Colors.white,
+                                //             size: 28,
+                                //           ),
+                                //           SizedBox(width: 10),
+                                //           Text(
+                                //             "Rental Summary",
+                                //             style: TextStyle(
+                                //               fontSize: 24,
+                                //               fontWeight: FontWeight.bold,
+                                //               color: Colors.white,
+                                //             ),
+                                //           ),
+                                //         ],
+                                //       ),
+                                //
+                                //       const SizedBox(height: 30),
+                                //
+                                //       /// PRICE ROWS
+                                //       _priceRow("Rental Subtotal:", "₹729.00"),
+                                //       const SizedBox(height: 12),
+                                //
+                                //       _priceRow("Delivery Charge:", "₹99.00"),
+                                //       const SizedBox(height: 12),
+                                //
+                                //       _priceRow("Tax (18% GST):", "₹131.22"),
+                                //
+                                //       const SizedBox(height: 20),
+                                //
+                                //       const Divider(color: Colors.white54),
+                                //
+                                //       const SizedBox(height: 15),
+                                //
+                                //       /// TOTAL
+                                //       const Row(
+                                //         mainAxisAlignment:
+                                //             MainAxisAlignment.spaceBetween,
+                                //         children: [
+                                //           Text(
+                                //             "Total Payable:",
+                                //             style: TextStyle(
+                                //               fontSize: 20,
+                                //               fontWeight: FontWeight.bold,
+                                //               color: Colors.white,
+                                //             ),
+                                //           ),
+                                //           Text(
+                                //             "₹959.22",
+                                //             style: TextStyle(
+                                //               fontSize: 22,
+                                //               fontWeight: FontWeight.bold,
+                                //               color: Colors.white,
+                                //             ),
+                                //           ),
+                                //         ],
+                                //       ),
+                                //
+                                //       const SizedBox(height: 30),
+                                //
+                                //       /// CHECKOUT BUTTON
+                                //       SizedBox(
+                                //         width: double.infinity,
+                                //         height: 50,
+                                //         child: ElevatedButton.icon(
+                                //           onPressed: () {},
+                                //           icon: const Icon(Icons.credit_card),
+                                //           label: const Text(
+                                //             "Proceed to Checkout",
+                                //             style: TextStyle(fontSize: 18),
+                                //           ),
+                                //           style: ElevatedButton.styleFrom(
+                                //             backgroundColor: Colors.white,
+                                //             foregroundColor: Colors.black,
+                                //             shape: RoundedRectangleBorder(
+                                //               borderRadius:
+                                //                   BorderRadius.circular(10),
+                                //             ),
+                                //           ),
+                                //         ),
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
+                                //
+                                // const SizedBox(height: 25),
+                                //
+                                // /// RENTAL POLICIES CARD
+                                // Container(
+                                //   width: double.infinity,
+                                //   padding: const EdgeInsets.all(20),
+                                //   decoration: BoxDecoration(
+                                //     color: Colors.grey.shade200,
+                                //     borderRadius: BorderRadius.circular(18),
+                                //   ),
+                                //   child: const Column(
+                                //     crossAxisAlignment:
+                                //         CrossAxisAlignment.start,
+                                //     children: [
+                                //       Row(
+                                //         children: [
+                                //           Icon(Icons.shield_outlined),
+                                //           SizedBox(width: 10),
+                                //           Text(
+                                //             "Rental Policies",
+                                //             style: TextStyle(
+                                //               fontSize: 20,
+                                //               fontWeight: FontWeight.bold,
+                                //             ),
+                                //           ),
+                                //         ],
+                                //       ),
+                                //
+                                //       SizedBox(height: 15),
+                                //
+                                //       Row(
+                                //         children: [
+                                //           Icon(
+                                //             Icons.check,
+                                //             color: Colors.green,
+                                //           ),
+                                //           SizedBox(width: 10),
+                                //           Text("Free pickup after rental"),
+                                //         ],
+                                //       ),
+                                //
+                                //       SizedBox(height: 10),
+                                //
+                                //       Row(
+                                //         children: [
+                                //           Icon(
+                                //             Icons.check,
+                                //             color: Colors.green,
+                                //           ),
+                                //           SizedBox(width: 10),
+                                //           Text(
+                                //             "Professional cleaning included",
+                                //           ),
+                                //         ],
+                                //       ),
+                                //
+                                //       SizedBox(height: 10),
+                                //
+                                //       Row(
+                                //         children: [
+                                //           Icon(
+                                //             Icons.check,
+                                //             color: Colors.green,
+                                //           ),
+                                //           SizedBox(width: 10),
+                                //           Text("Easy cancellation"),
+                                //         ],
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -576,6 +578,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                   ],
+                  if (selectedMenu == "My Rentals") ...[
+
+                    /// TOP BUTTONS
+                    RentalTopButtons(
+                      onRentNew: () {
+                        // navigate to shop page
+                      },
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    /// FILTER BUTTONS
+                    const RentalFilterButtons(),
+
+                  ]
                 ],
               ),
             ),
@@ -919,3 +936,575 @@ Widget _addressGuidelines() {
 }
 
 //--------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------
+// My Rental
+
+class RentalTopButtons extends StatelessWidget {
+  final VoidCallback onRentNew;
+
+  const RentalTopButtons({super.key, required this.onRentNew});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+
+        /// LEFT SIDE (ICON + TITLE)
+        Row(
+          children: const [
+            Icon(Icons.inventory_2_outlined, size: 20),
+            SizedBox(width: 8),
+            Text(
+              "My Rentals",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+
+        /// RIGHT SIDE BUTTON
+        ElevatedButton.icon(
+          onPressed: onRentNew,
+          icon: const Icon(Icons.add,color:Colors.white),
+          label: const Text("Rent New Outfit",style: TextStyle(color:Colors.white),),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFFF7A45),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 14,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+class RentalFilterButtons extends StatefulWidget {
+  const RentalFilterButtons({super.key});
+
+  @override
+  State<RentalFilterButtons> createState() => _RentalFilterButtonsState();
+}
+class _RentalFilterButtonsState extends State<RentalFilterButtons> {
+  List rentals = [
+    {
+      "orderId": "000011",
+      "status": "Delivered",
+      "price": "₹1,312.04",
+      "date": "March 7, 2026",
+      "items": "3 items",
+      "borderColor": Colors.teal
+    },
+    {
+      "orderId": "000010",
+      "status": "Paid",
+      "price": "₹3,341.64",
+      "date": "March 7, 2026",
+      "items": "4 items",
+      "borderColor": Colors.grey
+    }
+  ];
+
+  String selectedFilter = "All Rentals";
+
+  final List<String> filters = [
+    "All Rentals",
+    "Active",
+    "Upcoming",
+    "Past"
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        /// FILTER BUTTONS
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: filters.map((filter) {
+
+              bool isSelected = selectedFilter == filter;
+
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectedFilter = filter;
+                  });
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(right: 24),
+                  padding: const EdgeInsets.only(bottom: 10),
+                  decoration: BoxDecoration(
+                    border: isSelected
+                        ? const Border(
+                      bottom: BorderSide(
+                        color: Colors.black,
+                        width: 2,
+                      ),
+                    )
+                        : null,
+                  ),
+                  child: Text(
+                    filter,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isSelected ? Colors.black : Colors.blue,
+                      fontWeight:
+                      isSelected ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        /// RENTAL CARDS
+        if (selectedFilter == "All Rentals") ...[
+          ...rentals.map(
+                (rental) => Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: RentalOrderCard(
+                orderId: rental["orderId"],
+                status: rental["status"],
+                price: rental["price"],
+                date: rental["date"],
+                items: rental["items"],
+                borderColor: rental["borderColor"],
+                onViewDetails: () {},
+              ),
+            ),
+          )
+        ],
+
+        if (selectedFilter == "Active") ...[
+          const NoActiveRentals(),
+        ],
+        if (selectedFilter == "Upcoming") ...[
+          const NoUpcomingRentals(),
+        ],
+        if (selectedFilter == "Past") ...[
+          const NoPastRentals(),
+        ],
+        const SizedBox(height: 20),
+
+        /// NEED HELP SECTION
+        const NeedHelpSection(),
+      ],
+    );
+  }
+}
+
+class NoActiveRentals extends StatelessWidget {
+  const NoActiveRentals({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 60),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+
+          /// ICON CIRCLE
+          Container(
+            width: 90,
+            height: 90,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.access_time,
+              size: 40,
+              color: Colors.white,
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          /// TITLE
+          const Text(
+            "No active rentals",
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          /// DESCRIPTION
+          const Text(
+            "You don't have any active rentals at the moment.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black54,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+class NoUpcomingRentals extends StatelessWidget {
+  const NoUpcomingRentals({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 60),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+
+          /// ICON CIRCLE
+          Container(
+            width: 90,
+            height: 90,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.access_time,
+              size: 40,
+              color: Colors.white,
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          /// TITLE
+          const Text(
+            "No Upcoming rentals",
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          /// DESCRIPTION
+          const Text(
+            "You don't have any upcoming rentals scheduled.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black54,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+class NoPastRentals extends StatelessWidget {
+  const NoPastRentals({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 60),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+
+          /// ICON CIRCLE
+          Container(
+            width: 90,
+            height: 90,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.access_time,
+              size: 40,
+              color: Colors.white,
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          /// TITLE
+          const Text(
+            "No Past rentals",
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          /// DESCRIPTION
+          const Text(
+            "You haven't completed any rentals yet.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black54,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class RentalOrderCard extends StatelessWidget {
+  final String orderId;
+  final String status;
+  final String price;
+  final String date;
+  final String items;
+  final Color borderColor;
+  final VoidCallback onViewDetails;
+
+  const RentalOrderCard({
+    super.key,
+    required this.orderId,
+    required this.status,
+    required this.price,
+    required this.date,
+    required this.items,
+    required this.borderColor,
+    required this.onViewDetails,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            spreadRadius: 2,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          /// LEFT COLORED BORDER
+          Container(
+            width: 5,
+            height: 140,
+            decoration: BoxDecoration(
+              color: borderColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                bottomLeft: Radius.circular(16),
+              ),
+            ),
+          ),
+
+          /// CONTENT
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  /// ORDER + STATUS
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xff2d3e50),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          "ORDER #$orderId",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.blueGrey.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          status,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  /// PRICE
+                  Text(
+                    price,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  /// DATE
+                  Row(
+                    children: [
+                      const Icon(Icons.calendar_today, size: 16),
+                      const SizedBox(width: 6),
+                      Text(date),
+                    ],
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  /// ITEMS
+                  Row(
+                    children: [
+                      const Icon(Icons.checkroom, size: 18),
+                      const SizedBox(width: 6),
+                      Text(items),
+                    ],
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  /// BUTTON
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton.icon(
+                      onPressed: onViewDetails,
+                      icon: const Icon(Icons.remove_red_eye, size: 18),
+                      label: const Text("View Details"),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class NeedHelpSection extends StatelessWidget {
+  const NeedHelpSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.grey.shade300,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          /// TITLE ROW
+          Row(
+            children: const [
+              Icon(Icons.help_outline, size: 22),
+              SizedBox(width: 8),
+              Text(
+                "Need Help?",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          /// DESCRIPTION
+          const Text(
+            "If you have any questions about your rentals:",
+            style: TextStyle(fontSize: 14),
+          ),
+
+          const SizedBox(height: 10),
+
+          /// SUPPORT EMAIL
+          const Text(
+            "• Contact our support team at support@shopnest.com",
+            style: TextStyle(fontSize: 14),
+          ),
+
+          const SizedBox(height: 6),
+
+          /// PHONE
+          const Text(
+            "• Call us at +1 234 567 8900",
+            style: TextStyle(fontSize: 14),
+          ),
+
+          const SizedBox(height: 6),
+
+          /// FAQ LINK
+          Row(
+            children: const [
+              Text("• Check our "),
+              Text(
+                "FAQ section",
+                style: TextStyle(
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+//--------------------------------------------------------------------------

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 // import 'package:new_app/data/services/authentication_service.dart';
 import 'package:shopnest/components/custom_snackbar.dart';
 import 'package:shopnest/components/main_layout_drawer.dart';
+import 'package:shopnest/screens/login.dart';
 
 class ShopNestSignup extends StatefulWidget {
   const ShopNestSignup({super.key});
@@ -337,7 +338,7 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
 
                     Center(
                       child: GestureDetector(
-                        onTap: () => Get.back(),
+                        onTap: () => Get.to(ShopNestLogin()),
                         child: const Text.rich(
                           TextSpan(
                             text: "Already have an account? ",
