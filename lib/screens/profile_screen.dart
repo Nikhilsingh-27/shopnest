@@ -602,7 +602,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     /// TOP BUTTONS
                     RentalTopButtons(
                       onRentNew: () {
-                        // navigate to shop page
+                        Get.toNamed("/rentclothes");
                       },
                     ),
 
