@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 
 class ShopFooter extends StatelessWidget {
   const ShopFooter({super.key});
@@ -252,6 +253,18 @@ class _FooterColumn extends StatelessWidget {
 
   const _FooterColumn({required this.title, required this.items});
 
+  void _navigate(String item) {
+    if (item == "Home") {
+      Get.toNamed("/");
+    } else if (item == "Rent Clothes") {
+      Get.toNamed("/rentclothes");
+    } else if (item == "Categories") {
+      Get.toNamed("/categories");
+    } else if (item == "Contact") {
+      Get.toNamed("/contact");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -265,12 +278,16 @@ class _FooterColumn extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+
         const SizedBox(height: 15),
 
         ...items.map(
           (item) => Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text(item, style: const TextStyle(color: Colors.white70)),
+            child: InkWell(
+              onTap: () => _navigate(item),
+              child: Text(item, style: const TextStyle(color: Colors.white70)),
+            ),
           ),
         ),
       ],

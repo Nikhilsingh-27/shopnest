@@ -56,11 +56,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
       "finalPrice": 2560,
     },
   ];
+  // bool argsLoaded = false;
+  @override
+  void initState() {
+    super.initState();
 
+    final args = Get.arguments;
+
+    if (args != null && args["select"] != null) {
+      selectedMenu = args["select"];
+    }
+  }
 
   String selectedMenu = "Profile";
   @override
   Widget build(BuildContext context) {
+    /// GET ARGUMENT FROM DRAWER
+    // if (!argsLoaded) {
+    //   final args = Get.arguments;
+    //
+    //   if (args != null && args["select"] != null) {
+    //     selectedMenu = args["select"];
+    //   }
+    //
+    //   argsLoaded = true;
+    // }
     return MainLayout(
       child: SingleChildScrollView(
         child: Column(
@@ -579,7 +599,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ],
                   if (selectedMenu == "My Rentals") ...[
-
                     /// TOP BUTTONS
                     RentalTopButtons(
                       onRentNew: () {
@@ -591,8 +610,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     /// FILTER BUTTONS
                     const RentalFilterButtons(),
-
-                  ]
+                  ],
                 ],
               ),
             ),
@@ -937,7 +955,6 @@ Widget _addressGuidelines() {
 
 //--------------------------------------------------------------------
 
-
 //---------------------------------------------------------------------
 // My Rental
 
@@ -951,7 +968,6 @@ class RentalTopButtons extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-
         /// LEFT SIDE (ICON + TITLE)
         Row(
           children: const [
@@ -959,10 +975,7 @@ class RentalTopButtons extends StatelessWidget {
             SizedBox(width: 8),
             Text(
               "My Rentals",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -970,14 +983,14 @@ class RentalTopButtons extends StatelessWidget {
         /// RIGHT SIDE BUTTON
         ElevatedButton.icon(
           onPressed: onRentNew,
-          icon: const Icon(Icons.add,color:Colors.white),
-          label: const Text("Rent New Outfit",style: TextStyle(color:Colors.white),),
+          icon: const Icon(Icons.add, color: Colors.white),
+          label: const Text(
+            "Rent New Outfit",
+            style: TextStyle(color: Colors.white),
+          ),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFFF7A45),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 14,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
@@ -987,12 +1000,14 @@ class RentalTopButtons extends StatelessWidget {
     );
   }
 }
+
 class RentalFilterButtons extends StatefulWidget {
   const RentalFilterButtons({super.key});
 
   @override
   State<RentalFilterButtons> createState() => _RentalFilterButtonsState();
 }
+
 class _RentalFilterButtonsState extends State<RentalFilterButtons> {
   List rentals = [
     {
@@ -1001,7 +1016,7 @@ class _RentalFilterButtonsState extends State<RentalFilterButtons> {
       "price": "₹1,312.04",
       "date": "March 7, 2026",
       "items": "3 items",
-      "borderColor": Colors.teal
+      "borderColor": Colors.teal,
     },
     {
       "orderId": "000010",
@@ -1009,31 +1024,24 @@ class _RentalFilterButtonsState extends State<RentalFilterButtons> {
       "price": "₹3,341.64",
       "date": "March 7, 2026",
       "items": "4 items",
-      "borderColor": Colors.grey
-    }
+      "borderColor": Colors.grey,
+    },
   ];
 
   String selectedFilter = "All Rentals";
 
-  final List<String> filters = [
-    "All Rentals",
-    "Active",
-    "Upcoming",
-    "Past"
-  ];
+  final List<String> filters = ["All Rentals", "Active", "Upcoming", "Past"];
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         /// FILTER BUTTONS
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: filters.map((filter) {
-
               bool isSelected = selectedFilter == filter;
 
               return GestureDetector(
@@ -1048,11 +1056,8 @@ class _RentalFilterButtonsState extends State<RentalFilterButtons> {
                   decoration: BoxDecoration(
                     border: isSelected
                         ? const Border(
-                      bottom: BorderSide(
-                        color: Colors.black,
-                        width: 2,
-                      ),
-                    )
+                            bottom: BorderSide(color: Colors.black, width: 2),
+                          )
                         : null,
                   ),
                   child: Text(
@@ -1060,8 +1065,9 @@ class _RentalFilterButtonsState extends State<RentalFilterButtons> {
                     style: TextStyle(
                       fontSize: 16,
                       color: isSelected ? Colors.black : Colors.blue,
-                      fontWeight:
-                      isSelected ? FontWeight.w600 : FontWeight.w400,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w400,
                     ),
                   ),
                 ),
@@ -1075,7 +1081,7 @@ class _RentalFilterButtonsState extends State<RentalFilterButtons> {
         /// RENTAL CARDS
         if (selectedFilter == "All Rentals") ...[
           ...rentals.map(
-                (rental) => Padding(
+            (rental) => Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: RentalOrderCard(
                 orderId: rental["orderId"],
@@ -1087,18 +1093,12 @@ class _RentalFilterButtonsState extends State<RentalFilterButtons> {
                 onViewDetails: () {},
               ),
             ),
-          )
+          ),
         ],
 
-        if (selectedFilter == "Active") ...[
-          const NoActiveRentals(),
-        ],
-        if (selectedFilter == "Upcoming") ...[
-          const NoUpcomingRentals(),
-        ],
-        if (selectedFilter == "Past") ...[
-          const NoPastRentals(),
-        ],
+        if (selectedFilter == "Active") ...[const NoActiveRentals()],
+        if (selectedFilter == "Upcoming") ...[const NoUpcomingRentals()],
+        if (selectedFilter == "Past") ...[const NoPastRentals()],
         const SizedBox(height: 20),
 
         /// NEED HELP SECTION
@@ -1119,7 +1119,6 @@ class NoActiveRentals extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-
           /// ICON CIRCLE
           Container(
             width: 90,
@@ -1128,11 +1127,7 @@ class NoActiveRentals extends StatelessWidget {
               color: Colors.grey.shade300,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.access_time,
-              size: 40,
-              color: Colors.white,
-            ),
+            child: const Icon(Icons.access_time, size: 40, color: Colors.white),
           ),
 
           const SizedBox(height: 24),
@@ -1140,10 +1135,7 @@ class NoActiveRentals extends StatelessWidget {
           /// TITLE
           const Text(
             "No active rentals",
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
           ),
 
           const SizedBox(height: 12),
@@ -1152,16 +1144,14 @@ class NoActiveRentals extends StatelessWidget {
           const Text(
             "You don't have any active rentals at the moment.",
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black54,
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.black54),
           ),
         ],
       ),
     );
   }
 }
+
 class NoUpcomingRentals extends StatelessWidget {
   const NoUpcomingRentals({super.key});
 
@@ -1173,7 +1163,6 @@ class NoUpcomingRentals extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-
           /// ICON CIRCLE
           Container(
             width: 90,
@@ -1182,11 +1171,7 @@ class NoUpcomingRentals extends StatelessWidget {
               color: Colors.grey.shade300,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.access_time,
-              size: 40,
-              color: Colors.white,
-            ),
+            child: const Icon(Icons.access_time, size: 40, color: Colors.white),
           ),
 
           const SizedBox(height: 24),
@@ -1194,10 +1179,7 @@ class NoUpcomingRentals extends StatelessWidget {
           /// TITLE
           const Text(
             "No Upcoming rentals",
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
           ),
 
           const SizedBox(height: 12),
@@ -1206,16 +1188,14 @@ class NoUpcomingRentals extends StatelessWidget {
           const Text(
             "You don't have any upcoming rentals scheduled.",
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black54,
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.black54),
           ),
         ],
       ),
     );
   }
 }
+
 class NoPastRentals extends StatelessWidget {
   const NoPastRentals({super.key});
 
@@ -1227,7 +1207,6 @@ class NoPastRentals extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-
           /// ICON CIRCLE
           Container(
             width: 90,
@@ -1236,11 +1215,7 @@ class NoPastRentals extends StatelessWidget {
               color: Colors.grey.shade300,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.access_time,
-              size: 40,
-              color: Colors.white,
-            ),
+            child: const Icon(Icons.access_time, size: 40, color: Colors.white),
           ),
 
           const SizedBox(height: 24),
@@ -1248,10 +1223,7 @@ class NoPastRentals extends StatelessWidget {
           /// TITLE
           const Text(
             "No Past rentals",
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
           ),
 
           const SizedBox(height: 12),
@@ -1260,10 +1232,7 @@ class NoPastRentals extends StatelessWidget {
           const Text(
             "You haven't completed any rentals yet.",
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black54,
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.black54),
           ),
         ],
       ),
@@ -1329,14 +1298,15 @@ class RentalOrderCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   /// ORDER + STATUS
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xff2d3e50),
                           borderRadius: BorderRadius.circular(8),
@@ -1352,18 +1322,18 @@ class RentalOrderCard extends StatelessWidget {
 
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.blueGrey.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           status,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
-                      )
+                      ),
                     ],
                   ),
 
@@ -1411,17 +1381,19 @@ class RentalOrderCard extends StatelessWidget {
                       label: const Text("View Details"),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -1439,14 +1411,11 @@ class NeedHelpSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.grey.shade300,
-        ),
+        border: Border.all(color: Colors.grey.shade300),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           /// TITLE ROW
           Row(
             children: const [
@@ -1454,10 +1423,7 @@ class NeedHelpSection extends StatelessWidget {
               SizedBox(width: 8),
               Text(
                 "Need Help?",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ],
           ),

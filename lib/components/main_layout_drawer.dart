@@ -77,7 +77,7 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
               _menuItem(Icons.local_offer, "Categories", "/categories"),
               _menuItem(Icons.shopping_cart, "Cart", "/cart"),
               _menuItem(Icons.login, "Login", "/login"),
-              SizedBox(height: 8,),
+              SizedBox(height: 8),
               SizedBox(
                 width: double.infinity,
                 height: 48,
@@ -85,13 +85,14 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
                   onPressed: () {
                     Get.to(ShopNestSignup());
                   },
-                  icon: const Icon(Icons.person_add_alt_1, color: Colors.white,fontWeight: FontWeight.bold,),
+                  icon: const Icon(
+                    Icons.person_add_alt_1,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                   label: const Text(
                     "Sign Up Free",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFFFF7A45), // orange color
@@ -224,8 +225,8 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
                       const Divider(),
 
                       _profileItem(Icons.settings, "Profile", "/profile"),
-                      _profileItem(Icons.inventory_2, "My Rentals", "/rentals"),
-                      _profileItem(Icons.favorite, "Wishlist", "/wishlist"),
+                      _profileItem(Icons.inventory_2, "My Rentals", "/profile"),
+                      _profileItem(Icons.favorite, "Wishlist", "/profile"),
 
                       const Divider(),
 
@@ -285,7 +286,18 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
       leading: Icon(icon, color: color ?? Colors.black87),
       title: Text(title, style: TextStyle(color: color ?? Colors.black87)),
       onTap: () {
-        Get.toNamed(route);
+        if (route == "/profile") {
+          // Get.offNamedUntil(
+          //   route,
+          //   (route) => route.settings.name != route,
+          //   arguments: {"select": title},
+          // );
+          Get.toNamed(
+            route,
+            arguments: {"select": title},
+            preventDuplicates: false,
+          );
+        }
       },
     );
   }

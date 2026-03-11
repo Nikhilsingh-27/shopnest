@@ -181,7 +181,9 @@ class _CartScreenState extends State<CartScreen> {
                               width: double.infinity,
                               height: 50,
                               child: ElevatedButton.icon(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Get.toNamed("/checkout");
+                                },
                                 icon: const Icon(Icons.credit_card),
                                 label: const Text(
                                   "Proceed to Checkout",

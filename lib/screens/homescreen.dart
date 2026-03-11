@@ -7,8 +7,28 @@ import 'package:shopnest/components/shopfooter_section.dart';
 import 'package:shopnest/components/stats_section.dart';
 import 'package:shopnest/components/trendingcollection_section.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class Homescreen extends StatefulWidget {
+  const Homescreen({super.key});
+
+  @override
+  State<Homescreen> createState() => _HomescreenState();
+}
+
+class _HomescreenState extends State<Homescreen> {
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey howItWorksKey = GlobalKey();
+
+  void scrollToHowItWorks() {
+    final context = howItWorksKey.currentContext;
+
+    if (context != null) {
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +40,7 @@ class HomeScreen extends StatelessWidget {
       child: SafeArea(
         child: Builder(
           builder: (context) => SingleChildScrollView(
+            controller: _scrollController,
             child: Column(
               children: [
                 /// HERO SECTION
@@ -113,7 +134,9 @@ class HomeScreen extends StatelessWidget {
 
                             /// SECONDARY BUTTON
                             InkWell(
-                              onTap: () {},
+                              onTap: () {
+                                scrollToHowItWorks();
+                              },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 30,
@@ -213,11 +236,14 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 7),
                 StatsSection(),
                 const SizedBox(height: 20),
-                const Text(
-                  "How ShopNest Works",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                Container(
+                  key: howItWorksKey,
+                  child: const Text(
+                    "How ShopNest Works",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
                 ),
-                const SizedBox(height: 7),
+                const SizedBox(height: 2),
                 HowItWorksSection(),
                 const SizedBox(height: 20),
                 ShopFooter(),
@@ -226,22 +252,6 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  /// Drawer Item
-  static Widget _drawerItem(IconData icon, String title, String routeName) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 8),
-      leading: Icon(icon, color: Colors.white70, size: 26),
-      title: Text(
-        title,
-        style: const TextStyle(color: Colors.white70, fontSize: 18),
-      ),
-      onTap: () {
-        Get.back();
-        Get.toNamed(routeName);
-      },
     );
   }
 }

@@ -11,5 +11,5 @@ abstract class Routes {
   static const profile = '/profile';
   static const verify = '/verify';
 
-
+  static const chekout = '/checkout';
 }
