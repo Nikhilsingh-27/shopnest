@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shopnest/core/storage/token_storage.dart';
+import 'package:shopnest/screens/login.dart';
 import 'package:shopnest/screens/signup.dart';
 
 class MainLayout extends StatelessWidget {
@@ -9,6 +11,9 @@ class MainLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final storage = TokenStorage();
+
+    var user = storage.getUser();
     return Scaffold(
       endDrawer: const AppEndDrawer(),
 
@@ -63,6 +68,9 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    final storage = TokenStorage();
+
+    var user = storage.getUser();
     return SafeArea(
       child: Drawer(
         width: 270,
@@ -115,8 +123,8 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
 
                     const SizedBox(width: 8),
 
-                    const Text(
-                      "Nikhil",
+                    Text(
+                      user?["name"] ?? "",
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
 
@@ -297,6 +305,10 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
             arguments: {"select": title},
             preventDuplicates: false,
           );
+        }
+        if (route == "/login") {
+          TokenStorage().clearAuth();
+          Get.to(ShopNestLogin());
         }
       },
     );

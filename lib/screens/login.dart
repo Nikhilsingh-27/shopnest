@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 // import 'package:new_app/data/services/authentication_service.dart';
 import 'package:shopnest/components/custom_snackbar.dart';
 import 'package:shopnest/components/main_layout_drawer.dart';
+import 'package:shopnest/modules/controllers/auth_controller.dart';
 
 class ShopNestLogin extends StatefulWidget {
   const ShopNestLogin({super.key});
@@ -12,6 +13,7 @@ class ShopNestLogin extends StatefulWidget {
 }
 
 class _ShopNestLoginState extends State<ShopNestLogin> {
+  final AuthController authController = Get.put(AuthController());
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -62,10 +64,8 @@ class _ShopNestLoginState extends State<ShopNestLogin> {
     setState(() => isLoading = true);
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
-
       setState(() => isLoading = false);
-
+      await authController.login(email, password);
       CustomSnackbar.showSuccessSlow("Login successful!");
       Get.offAllNamed("/home");
     } catch (e) {
