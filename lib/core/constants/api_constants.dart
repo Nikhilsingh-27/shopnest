@@ -7,4 +7,5 @@ class ApiConstants {
 
   // public api
   static const products = "/products";
+  static const categories = "/categories";
 }

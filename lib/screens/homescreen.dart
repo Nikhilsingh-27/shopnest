@@ -6,6 +6,7 @@ import 'package:shopnest/components/main_layout_drawer.dart';
 import 'package:shopnest/components/shopfooter_section.dart';
 import 'package:shopnest/components/stats_section.dart';
 import 'package:shopnest/components/trendingcollection_section.dart';
+import 'package:shopnest/data/repositories/auth_repository.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -17,6 +18,13 @@ class Homescreen extends StatefulWidget {
 class _HomescreenState extends State<Homescreen> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey howItWorksKey = GlobalKey();
+  final homedata = Get.find<AuthRepository>();
+
+  @override
+  void initState() {
+    super.initState();
+    homedata.getcategoriesfun();
+  }
 
   void scrollToHowItWorks() {
     final context = howItWorksKey.currentContext;

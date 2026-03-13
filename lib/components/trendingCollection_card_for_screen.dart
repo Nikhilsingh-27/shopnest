@@ -9,9 +9,32 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String getLogoImageUrl(String? logoPath) {
+      const String baseUrl = "https://www.dizaartdemo.com/";
+      const String defaultImage =
+          "${baseUrl}public/front/assets/img/list-8.jpg";
+
+      if (logoPath == null || logoPath.trim().isEmpty) {
+        return defaultImage;
+      }
+
+      final imageName = logoPath.split('/').last;
+      if (imageName.isEmpty) return defaultImage;
+
+      return "${baseUrl}demo/shopnest/assets/images/products/$imageName";
+    }
+
+    final name = item["name"] ?? "";
+    final size = item["size"] ?? "N/A";
+    final color = item["color"] ?? "N/A";
+    final rentalPrice = item["rental_price"] ?? "0";
+    final securityDeposit = item["security_deposit"] ?? "0";
+    final discount = item["discount_percent"] ?? 0;
+    final price = item["price"] ?? "0";
+    final image = getLogoImageUrl(item["images"]);
+
     return Container(
       width: double.infinity,
-
       margin: const EdgeInsets.only(bottom: 18),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -27,14 +50,21 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// IMAGE
+          /// PRODUCT IMAGE
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
-            child: Image.network(
-              item["image"],
-              height: 250,
-              width: double.infinity,
-              fit: BoxFit.cover,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Image.network(
+                image,
+                width: double.infinity,
+                fit: BoxFit.fill,
+                errorBuilder: (_, __, ___) => Container(
+                  color: Colors.grey[300],
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.image_not_supported),
+                ),
+              ),
             ),
           ),
 
@@ -46,7 +76,7 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
               children: [
                 /// TITLE
                 Text(
-                  item["title"],
+                  name,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -64,12 +94,10 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
                       color: Colors.black54,
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      "Size: ${item["size"]}",
-                      style: const TextStyle(fontSize: 14),
-                    ),
+                    Text("Size: $size", style: const TextStyle(fontSize: 14)),
                   ],
                 ),
+
                 const SizedBox(height: 6),
 
                 /// COLOR
@@ -77,16 +105,13 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
                   children: [
                     const Icon(Icons.palette, size: 18, color: Colors.black54),
                     const SizedBox(width: 6),
-                    Text(
-                      "Color: ${item["color"]}",
-                      style: const TextStyle(fontSize: 14),
-                    ),
+                    Text("Color: $color", style: const TextStyle(fontSize: 14)),
                   ],
                 ),
 
                 const SizedBox(height: 10),
 
-                /// RENT
+                /// RENTAL PRICE
                 RichText(
                   text: TextSpan(
                     style: const TextStyle(fontSize: 15, color: Colors.black87),
@@ -98,14 +123,14 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      TextSpan(text: "₹${item["rent"]}.00/day"),
+                      TextSpan(text: "₹$rentalPrice/day"),
                     ],
                   ),
                 ),
 
                 const SizedBox(height: 4),
 
-                /// SECURITY
+                /// SECURITY DEPOSIT
                 RichText(
                   text: TextSpan(
                     style: const TextStyle(fontSize: 15, color: Colors.black87),
@@ -117,7 +142,7 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const TextSpan(text: "₹2,500.00"),
+                      TextSpan(text: "₹$securityDeposit"),
                     ],
                   ),
                 ),
@@ -136,7 +161,7 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      TextSpan(text: "${item["discount"]}%"),
+                      TextSpan(text: "$discount%"),
                     ],
                   ),
                 ),
@@ -145,7 +170,7 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
 
                 /// FINAL PRICE
                 Text(
-                  "₹${item["finalPrice"]}.00/day",
+                  "₹$price/day",
                   style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
@@ -162,7 +187,7 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () {
-                          Get.to(SingleproductScreen(item: item));
+                          Get.to(() => SingleproductScreen(item: item));
                         },
                         icon: const Icon(Icons.remove_red_eye),
                         label: const Text("Details"),
@@ -188,7 +213,7 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
                         label: const Text("Add to Cart"),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          backgroundColor: Color(0xFFff713b),
+                          backgroundColor: const Color(0xFFff713b),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25),
                           ),

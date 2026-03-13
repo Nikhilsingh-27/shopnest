@@ -48,7 +48,7 @@ class AuthProvider {
   // PUBLIC API (NO TOKEN)
   Future<Response> getProducts() async {
     return await dio.get(
-      ApiConstants.products,
+      ApiConstants.categories,
       options: Options(extra: {"requiresToken": false}),
     );
   }

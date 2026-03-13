@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shopnest/data/repositories/auth_repository.dart';
 
 import 'browsemycategory_card.dart';
 
@@ -20,27 +21,7 @@ class _BrowsemycategorySectionState extends State<BrowsemycategorySection> {
   int _currentPage = 0;
   bool _autoScrollStarted = false;
 
-  /// Dummy Data
-  final List<Map<String, dynamic>> categories = [
-    {
-      "title": "Traditional Wear",
-      "description": "Ethnic and traditional clothing for all occasions",
-      "icon": Icons.checkroom,
-      "buttonText": "Browse",
-    },
-    {
-      "title": "Wedding Collection",
-      "description": "Perfect outfits for weddings and receptions",
-      "icon": Icons.diamond,
-      "buttonText": "Browse",
-    },
-    {
-      "title": "Party Wear",
-      "description": "Stylish outfits for parties and events",
-      "icon": Icons.celebration,
-      "buttonText": "Browse",
-    },
-  ];
+  final home = Get.find<AuthRepository>();
 
   void _startAutoScroll(int itemCount) {
     if (_autoScrollStarted || itemCount <= 1) return;
@@ -69,28 +50,42 @@ class _BrowsemycategorySectionState extends State<BrowsemycategorySection> {
 
   @override
   Widget build(BuildContext context) {
-    _startAutoScroll(categories.length);
+    return Obx(() {
+      final categories = home.categories;
 
-    return SizedBox(
-      height: 300,
-      child: PageView.builder(
-        controller: _pageController,
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final item = categories[index];
+      if (categories.isEmpty) {
+        return const SizedBox(
+          height: 300,
+          child: Center(child: CircularProgressIndicator()),
+        );
+      }
 
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: BrowsemycategoryCard(
-              item: item,
-              onPressed: () {
-                Get.toNamed("/rentclothes");
-                //print("Clicked ${item['title']}");
-              },
-            ),
-          );
-        },
-      ),
-    );
+      _startAutoScroll(categories.length);
+
+      return SizedBox(
+        height: 300,
+        child: PageView.builder(
+          controller: _pageController,
+          itemCount: categories.length,
+          itemBuilder: (context, index) {
+            final item = categories[index];
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: BrowsemycategoryCard(
+                item: {
+                  "title": item["name"],
+                  "description": item["description"],
+                  "buttonText": "Browse",
+                },
+                onPressed: () {
+                  Get.toNamed("/rentclothes");
+                },
+              ),
+            );
+          },
+        ),
+      );
+    });
   }
 }

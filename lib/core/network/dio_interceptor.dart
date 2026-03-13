@@ -7,15 +7,16 @@ class DioInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // Check if request requires token
-    if (options.extra["requiresToken"] == true) {
+    final requiresToken = options.extra["requiresToken"] ?? true;
+
+    if (requiresToken) {
       final token = storage.getToken();
 
-      if (token != null) {
+      if (token != null && token.isNotEmpty) {
         options.headers["Authorization"] = "Bearer $token";
       }
     }
 
-    super.onRequest(options, handler);
+    handler.next(options); // continue request
   }
 }

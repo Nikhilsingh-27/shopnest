@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class BrowsemycategoryCard extends StatelessWidget {
   final Map<String, dynamic> item;
@@ -22,7 +23,7 @@ class BrowsemycategoryCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(item["icon"], size: 60, color: const Color(0xFFFF6A2A)),
+          FaIcon(FontAwesomeIcons.shirt, color: Color(0xFFFF6A2E), size: 80),
 
           const SizedBox(height: 20),
 
