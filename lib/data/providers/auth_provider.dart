@@ -17,6 +17,7 @@ class AuthProvider {
   Future<Map<String, dynamic>> register({
     required String name,
     required String email,
+    required String address,
     required String password,
     required String phone,
   }) async {
@@ -26,6 +27,7 @@ class AuthProvider {
         data: {
           "name": name,
           "email": email,
+          "address": address,
           "password": password,
           "phone": phone,
         },

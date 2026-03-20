@@ -23,4 +23,40 @@ class AuthController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<Map<String, dynamic>> register(
+    String name,
+    String email,
+    String phone,
+    String address,
+    String password,
+  ) async {
+    try {
+      isLoading.value = true;
+
+      final response = await repo.register(
+        name,
+        email,
+        address,
+        phone,
+        password,
+      );
+
+      print(response);
+
+      if (response["success"] == true) {
+        CustomSnackbar.showSuccessSlow("Registration successful!");
+        Get.offAllNamed("/home");
+      } else {
+        CustomSnackbar.showError(response["message"] ?? "Registration failed");
+      }
+
+      return response;
+    } catch (e) {
+      CustomSnackbar.showError("Registration error: $e");
+      return {"success": false, "message": e.toString()};
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }

@@ -25,6 +25,34 @@ class AuthRepository extends GetxController {
     return response.data;
   }
 
+  Future<Map<String, dynamic>> register(
+    String name,
+    String email,
+    String address,
+    String phone,
+    String password,
+  ) async {
+    final response = await provider.register(
+      name: name,
+      email: email,
+      address: address,
+      password: password,
+      phone: phone,
+    );
+
+    // provider.register already returns a parsed Map<String, dynamic>
+    if (response["success"] == true) {
+      final token = response["data"]?["token"];
+      final user = response["data"]?["user"];
+
+      if (token != null && user != null) {
+        storage.saveAuthData(token.toString(), Map<String, dynamic>.from(user));
+      }
+    }
+
+    return response;
+  }
+
   Future<Map<String, dynamic>> getcategoriesfun() async {
     final response = await dio.get(
       ApiConstants.categories,
@@ -55,6 +83,63 @@ class AuthRepository extends GetxController {
         throw Exception("Empty response from server");
       }
 
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final errorMessage =
+          e.response?.data?["message"] ?? e.message ?? "API error";
+
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<Map<String, dynamic>> getusercarts({required String id}) async {
+    try {
+      final response = await dio.get(
+        ApiConstants.cart,
+        queryParameters: {"id": id},
+        options: Options(extra: {"requiresToken": true}),
+      );
+
+      if (response.data == null) {
+        throw Exception("Empty response from server");
+      }
+
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final errorMessage =
+          e.response?.data?["message"] ?? e.message ?? "API error";
+
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<Map<String, dynamic>> addcartfun({
+    required String id,
+    required String quantity,
+  }) async {
+    try {
+      final response = await dio.post(
+        ApiConstants.addcart,
+        data: {"product_id": id, "quantity": quantity},
+        options: Options(extra: {"requiresToken": true}),
+      );
+      print(response.data);
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final errorMessage =
+          e.response?.data?["message"] ?? e.message ?? "API error";
+
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<Map<String, dynamic>> deletecartfun({required String id}) async {
+    try {
+      final response = await dio.post(
+        ApiConstants.deletecart,
+        data: {"cart_item_id": id},
+        options: Options(extra: {"requiresToken": true}),
+      );
       return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
       final errorMessage =

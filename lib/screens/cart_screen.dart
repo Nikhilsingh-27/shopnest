@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shopnest/components/cart_card.dart';
 import 'package:shopnest/components/main_layout_drawer.dart';
 import 'package:shopnest/components/shopfooter_section.dart';
+import 'package:shopnest/data/repositories/auth_repository.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -12,26 +13,77 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  final List<Map<String, dynamic>> productlist = [
-    {
-      "image": "https://images.unsplash.com/photo-1523381294911-8d3cead13475",
-      "title": "Casual Hoodie",
-      "size": "L",
-      "color": "Green",
-      "rent": 900,
-      "discount": 8,
-      "finalPrice": 828,
-    },
-    {
-      "image": "https://images.unsplash.com/photo-1509631179647-0177331693ae",
-      "title": "Formal Suit",
-      "size": "XL",
-      "color": "Navy Blue",
-      "rent": 3200,
-      "discount": 20,
-      "finalPrice": 2560,
-    },
-  ];
+  final home = Get.find<AuthRepository>();
+
+  List<Map<String, dynamic>> productlist = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCart();
+  }
+
+  int delivery = 99;
+  double applyGST(int amount) {
+    double gst = amount * 0.18;
+    return double.parse(gst.toStringAsFixed(4));
+  }
+
+  double finalprice = 0;
+  int totalamt = 0;
+  double gst = 0;
+  Future<void> fetchCart() async {
+    try {
+      final user = home.storage.getUser();
+      final id = user?["id"].toString();
+
+      final response = await home.getusercarts(id: id ?? "");
+
+      if (response["success"] == true) {
+        setState(() {
+          productlist = List<Map<String, dynamic>>.from(
+            response["data"]["items"],
+          );
+          totalamt = response["data"]["subtotal"];
+          gst = applyGST(totalamt);
+
+          finalprice = totalamt + gst + delivery;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Cart error: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  // final List<Map<String, dynamic>> productlist = [
+  //   {
+  //     "image": "https://images.unsplash.com/photo-1523381294911-8d3cead13475",
+  //     "title": "Casual Hoodie",
+  //     "size": "L",
+  //     "color": "Green",
+  //     "rent": 900,
+  //     "discount": 8,
+  //     "finalPrice": 828,
+  //   },
+  //   {
+  //     "image": "https://images.unsplash.com/photo-1509631179647-0177331693ae",
+  //     "title": "Formal Suit",
+  //     "size": "XL",
+  //     "color": "Navy Blue",
+  //     "rent": 3200,
+  //     "discount": 20,
+  //     "finalPrice": 2560,
+  //   },
+  // ];
   @override
   Widget build(BuildContext context) {
     return MainLayout(
@@ -65,7 +117,10 @@ class _CartScreenState extends State<CartScreen> {
                     children: productlist.map((product) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16),
-                        child: CartCard(item: product),
+                        child: CartCard(
+                          item: product,
+                          onDeleteSuccess: fetchCart,
+                        ),
                       );
                     }).toList(),
                   ),
@@ -137,13 +192,13 @@ class _CartScreenState extends State<CartScreen> {
                             const SizedBox(height: 30),
 
                             /// PRICE ROWS
-                            _priceRow("Rental Subtotal:", "₹729.00"),
+                            _priceRow("Rental Subtotal:", "₹${totalamt}"),
                             const SizedBox(height: 12),
 
                             _priceRow("Delivery Charge:", "₹99.00"),
                             const SizedBox(height: 12),
 
-                            _priceRow("Tax (18% GST):", "₹131.22"),
+                            _priceRow("Tax (18% GST):", "₹${gst}"),
 
                             const SizedBox(height: 20),
 
@@ -152,7 +207,7 @@ class _CartScreenState extends State<CartScreen> {
                             const SizedBox(height: 15),
 
                             /// TOTAL
-                            const Row(
+                            Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
@@ -164,7 +219,7 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 ),
                                 Text(
-                                  "₹959.22",
+                                  "₹$finalprice",
                                   style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,

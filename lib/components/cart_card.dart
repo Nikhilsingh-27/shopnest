@@ -1,12 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:shopnest/components/custom_snackbar.dart';
+import 'package:shopnest/data/repositories/auth_repository.dart';
 
 class CartCard extends StatelessWidget {
   final Map<String, dynamic> item;
-
-  const CartCard({super.key, required this.item});
+  final VoidCallback onDeleteSuccess;
+  const CartCard({
+    super.key,
+    required this.item,
+    required this.onDeleteSuccess,
+  });
 
   @override
   Widget build(BuildContext context) {
+    String getLogoImageUrl(String? logoPath) {
+      const String baseUrl = "https://www.dizaartdemo.com/";
+      const String defaultImage =
+          "${baseUrl}public/front/assets/img/list-8.jpg";
+
+      if (logoPath == null || logoPath.trim().isEmpty) {
+        return defaultImage;
+      }
+
+      final imageName = logoPath.split('/').last;
+      if (imageName.isEmpty) return defaultImage;
+
+      return "${baseUrl}demo/shopnest/assets/images/products/$imageName";
+    }
+
+    final AuthRepository repo = AuthRepository();
     return Container(
       width: double.infinity,
 
@@ -29,7 +51,7 @@ class CartCard extends StatelessWidget {
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
             child: Image.network(
-              item["image"],
+              getLogoImageUrl(item["images"]),
               height: 250,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -44,7 +66,7 @@ class CartCard extends StatelessWidget {
               children: [
                 /// TITLE
                 Text(
-                  item["title"],
+                  item["name"],
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -54,34 +76,33 @@ class CartCard extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 /// SIZE
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.straighten,
-                      size: 18,
-                      color: Colors.black54,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      "Size: ${item["size"]}",
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
+                // Row(
+                //   children: [
+                //     const Icon(
+                //       Icons.straighten,
+                //       size: 18,
+                //       color: Colors.black54,
+                //     ),
+                //     const SizedBox(width: 6),
+                //     Text(
+                //       "Size: ${item["size"]}",
+                //       style: const TextStyle(fontSize: 14),
+                //     ),
+                //   ],
+                // ),
+                // const SizedBox(height: 6),
 
                 /// COLOR
-                Row(
-                  children: [
-                    const Icon(Icons.palette, size: 18, color: Colors.black54),
-                    const SizedBox(width: 6),
-                    Text(
-                      "Color: ${item["color"]}",
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
-
+                // Row(
+                //   children: [
+                //     const Icon(Icons.palette, size: 18, color: Colors.black54),
+                //     const SizedBox(width: 6),
+                //     Text(
+                //       "Color: ${item["color"]}",
+                //       style: const TextStyle(fontSize: 14),
+                //     ),
+                //   ],
+                // ),
                 const SizedBox(height: 10),
 
                 /// RENT
@@ -96,7 +117,7 @@ class CartCard extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      TextSpan(text: "₹${item["rent"]}.00/day"),
+                      TextSpan(text: "₹${item["price"]}.00/day"),
                     ],
                   ),
                 ),
@@ -104,23 +125,23 @@ class CartCard extends StatelessWidget {
                 const SizedBox(height: 4),
 
                 /// SECURITY
-                RichText(
-                  text: TextSpan(
-                    style: const TextStyle(fontSize: 15, color: Colors.black87),
-                    children: [
-                      const TextSpan(
-                        text: "Security: ",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const TextSpan(text: "₹2,500.00"),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 4),
+                // RichText(
+                //   text: TextSpan(
+                //     style: const TextStyle(fontSize: 15, color: Colors.black87),
+                //     children: [
+                //       const TextSpan(
+                //         text: "Security: ",
+                //         style: TextStyle(
+                //           color: Colors.red,
+                //           fontWeight: FontWeight.w600,
+                //         ),
+                //       ),
+                //       const TextSpan(text: "₹2,500.00"),
+                //     ],
+                //   ),
+                // ),
+                //
+                // const SizedBox(height: 4),
 
                 /// DISCOUNT
                 RichText(
@@ -134,16 +155,32 @@ class CartCard extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      TextSpan(text: "${item["discount"]}%"),
+                      TextSpan(text: "${item["discount_percent"]}%"),
                     ],
                   ),
                 ),
 
                 const SizedBox(height: 10),
+                RichText(
+                  text: TextSpan(
+                    style: const TextStyle(fontSize: 15, color: Colors.black87),
+                    children: [
+                      const TextSpan(
+                        text: "Quantity: ",
+                        style: TextStyle(
+                          color: Color(0xFF6a6fd5),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      TextSpan(text: "${item["quantity"]}"),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
 
                 /// FINAL PRICE
                 Text(
-                  "₹${item["finalPrice"]}.00/day",
+                  "₹${item["line_total"]}.00/day",
                   style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
@@ -156,29 +193,32 @@ class CartCard extends StatelessWidget {
                 /// BUTTONS
                 Row(
                   children: [
-                    /// ADD TO CART
-                    Expanded(
-                      flex: 2,
-                      child: ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.add_shopping_cart),
-                        label: const Text("Add to Cart"),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          backgroundColor: Color(0xFFff713b),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 12),
-
                     /// Delete BUTTON
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () {},
+                        onPressed: () async {
+                          try {
+                            final res = await repo.deletecartfun(
+                              id: item["id"].toString(), // ✅ important
+                            );
+
+                            if (res["success"] == true) {
+                              CustomSnackbar.showSuccess(
+                                "Item removed from cart",
+                              );
+
+                              onDeleteSuccess();
+                              // 👉 OPTIONAL: refresh UI (very important)
+                              // You need to remove item from list or call API again
+                            } else {
+                              CustomSnackbar.showError(
+                                res["message"] ?? "Failed",
+                              );
+                            }
+                          } catch (e) {
+                            CustomSnackbar.showError(e.toString());
+                          }
+                        },
                         icon: const Icon(Icons.delete, color: Colors.white),
                         label: const Text(
                           "Delete",

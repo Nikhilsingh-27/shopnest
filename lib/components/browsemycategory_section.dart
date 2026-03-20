@@ -63,7 +63,7 @@ class _BrowsemycategorySectionState extends State<BrowsemycategorySection> {
       _startAutoScroll(categories.length);
 
       return SizedBox(
-        height: 300,
+        height: 311,
         child: PageView.builder(
           controller: _pageController,
           itemCount: categories.length,

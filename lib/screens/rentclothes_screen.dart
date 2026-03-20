@@ -168,6 +168,7 @@ class _RentclothesScreenState extends State<RentclothesScreen> {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 16),
                             child: TrendingcollectionCardForScreen(
+                              key: ValueKey(product["id"]),
                               item: product,
                             ),
                           );

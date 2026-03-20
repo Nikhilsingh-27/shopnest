@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 // import 'package:new_app/data/services/authentication_service.dart';
 import 'package:shopnest/components/custom_snackbar.dart';
 import 'package:shopnest/components/main_layout_drawer.dart';
+import 'package:shopnest/modules/controllers/auth_controller.dart';
 import 'package:shopnest/screens/login.dart';
 
 class ShopNestSignup extends StatefulWidget {
@@ -13,6 +14,7 @@ class ShopNestSignup extends StatefulWidget {
 }
 
 class _ShopNestSignupState extends State<ShopNestSignup> {
+  final AuthController authController = Get.put(AuthController());
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -54,8 +56,10 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
 
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    final phoneRegex = RegExp(r'^[0-9]{10}$');
     setState(() {
       nameError = false;
       emailError = false;
@@ -80,7 +84,7 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
 
     if (!emailRegex.hasMatch(email)) {
       setState(() => emailError = true);
-      CustomSnackbar.showError("Enter a valid email address");
+      CustomSnackbar.showError("Enter a valid email (e.g. example@gmail.com)");
       return;
     }
 
@@ -89,7 +93,11 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
       CustomSnackbar.showError("Phone number is required");
       return;
     }
-
+    if (!phoneRegex.hasMatch(phone)) {
+      setState(() => phoneError = true);
+      CustomSnackbar.showError("Phone number must be exactly 10 digits");
+      return;
+    }
     if (address.isEmpty) {
       setState(() => addressError = true);
       CustomSnackbar.showError("Delivery address is required");
@@ -129,15 +137,22 @@ class _ShopNestSignupState extends State<ShopNestSignup> {
     setState(() => isLoading = true);
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
+      final response = await authController.register(
+        name,
+        email,
+        phone,
+        address,
+        password,
+      );
 
-      setState(() => isLoading = false);
-
-      CustomSnackbar.showSuccessSlow("Account created successfully!");
-      Get.offAllNamed("/home");
+      // authController.register already handles navigation + success/snackbar
+      if (response != null && response is Map<String, dynamic>) {
+        // nothing else needed, already navigated to home on success
+      }
     } catch (e) {
-      setState(() => isLoading = false);
       CustomSnackbar.showError("Something went wrong. Try again.");
+    } finally {
+      setState(() => isLoading = false);
     }
   }
 
