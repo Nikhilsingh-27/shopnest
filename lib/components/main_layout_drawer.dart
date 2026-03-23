@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopnest/core/storage/token_storage.dart';
-import 'package:shopnest/screens/login.dart';
+import 'package:shopnest/screens/homescreen.dart';
 import 'package:shopnest/screens/signup.dart';
 
 class MainLayout extends StatelessWidget {
@@ -35,6 +35,25 @@ class MainLayout extends StatelessWidget {
         ),
 
         actions: [
+          IconButton(
+            icon: const Icon(Icons.shopping_cart, color: Colors.white),
+            onPressed: () async {
+              final storage = TokenStorage();
+              var user = storage.getUser();
+
+              if (user == null) {
+                // Go to login and wait for result
+                final result = await Get.toNamed("/login");
+
+                // After login success → go to cart
+                if (result == true) {
+                  Get.toNamed("/cart");
+                }
+              } else {
+                Get.toNamed("/cart");
+              }
+            },
+          ),
           Builder(
             builder: (context) => IconButton(
               icon: const Icon(Icons.menu, color: Colors.white),
@@ -84,176 +103,189 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
               _menuItem(Icons.checkroom, "Rent Clothes", "/rentclothes"),
               _menuItem(Icons.local_offer, "Categories", "/categories"),
               _menuItem(Icons.shopping_cart, "Cart", "/cart"),
-              _menuItem(Icons.login, "Login", "/login"),
-              SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Get.to(ShopNestSignup());
-                  },
-                  icon: const Icon(
-                    Icons.person_add_alt_1,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  label: const Text(
-                    "Sign Up Free",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFFF7A45), // orange color
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    elevation: 0,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
+              if (user == null) ...[
+                _menuItem(Icons.login, "Login", "/login"),
 
-              /// PROFILE ROW
-              InkWell(
-                onTap: toggleProfile,
-                child: Row(
-                  children: [
-                    const Icon(Icons.person, color: Colors.white70),
+                const SizedBox(height: 8),
 
-                    const SizedBox(width: 8),
-
-                    Text(
-                      user?["name"] ?? "",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-
-                    const SizedBox(width: 8),
-
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Text(
-                        "Unverified",
-                        style: TextStyle(color: Colors.white, fontSize: 11),
-                      ),
-                    ),
-
-                    const Spacer(),
-
-                    Icon(
-                      showProfileDropdown
-                          ? Icons.keyboard_arrow_up
-                          : Icons.keyboard_arrow_down,
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Get.to(ShopNestSignup());
+                    },
+                    icon: const Icon(
+                      Icons.person_add_alt_1,
                       color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              /// PROFILE DROPDOWN CARD
-              if (showProfileDropdown)
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    label: const Text(
+                      "Sign Up Free",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFFF7A45),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      elevation: 0,
+                    ),
                   ),
-                  child: Column(
+                ),
+              ],
+              const SizedBox(height: 10),
+
+              if (user != null) ...[
+                /// PROFILE ROW
+                InkWell(
+                  onTap: toggleProfile,
+                  child: Row(
                     children: [
-                      /// ID VERIFICATION SECTION
-                      Padding(
-                        padding: const EdgeInsets.all(14),
-                        child: Row(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.center, // center vertically
-                          children: [
-                            /// UNVERIFIED BADGE
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.orange,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Text(
-                                "Unverified",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
+                      const Icon(Icons.person, color: Colors.white70),
 
-                            const SizedBox(width: 12),
+                      const SizedBox(width: 8),
 
-                            /// TEXT SECTION
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    "ID Verification",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
+                      Text(
+                        user?["name"] ?? "",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
 
-                                  const SizedBox(height: 6),
+                      const SizedBox(width: 8),
 
-                                  InkWell(
-                                    onTap: () {
-                                      Get.toNamed("/verify");
-                                    },
-                                    child: const Text(
-                                      "Manage verification",
-                                      style: TextStyle(
-                                        color: Colors.blue,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Text(
+                          "Unverified",
+                          style: TextStyle(color: Colors.white, fontSize: 11),
                         ),
                       ),
-                      const Divider(),
 
-                      _profileItem(Icons.settings, "Profile", "/profile"),
-                      _profileItem(Icons.inventory_2, "My Rentals", "/profile"),
-                      _profileItem(Icons.favorite, "Wishlist", "/profile"),
+                      const Spacer(),
 
-                      const Divider(),
-
-                      _profileItem(
-                        Icons.badge,
-                        "Start Verification",
-                        "/verify",
-                        color: Colors.orange,
-                      ),
-
-                      _profileItem(
-                        Icons.logout,
-                        "Logout",
-                        "/login",
-                        color: Colors.red,
+                      Icon(
+                        showProfileDropdown
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        color: Colors.white,
                       ),
                     ],
                   ),
                 ),
+
+                const SizedBox(height: 15),
+
+                /// PROFILE DROPDOWN CARD
+                if (showProfileDropdown)
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        /// ID VERIFICATION SECTION
+                        Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Row(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.center, // center vertically
+                            children: [
+                              /// UNVERIFIED BADGE
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Text(
+                                  "Unverified",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(width: 12),
+
+                              /// TEXT SECTION
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "ID Verification",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black54,
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 6),
+
+                                    InkWell(
+                                      onTap: () {
+                                        Get.toNamed("/verify");
+                                      },
+                                      child: const Text(
+                                        "Manage verification",
+                                        style: TextStyle(
+                                          color: Colors.blue,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Divider(),
+
+                        _profileItem(Icons.settings, "Profile", "/profile"),
+                        _profileItem(
+                          Icons.inventory_2,
+                          "My Rentals",
+                          "/profile",
+                        ),
+                        _profileItem(Icons.favorite, "Wishlist", "/profile"),
+
+                        const Divider(),
+
+                        _profileItem(
+                          Icons.badge,
+                          "Start Verification",
+                          "/verify",
+                          color: Colors.orange,
+                        ),
+
+                        _profileItem(
+                          Icons.logout,
+                          "Logout",
+                          "/login",
+                          color: Colors.red,
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
             ],
           ),
         ),
@@ -308,7 +340,7 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
         }
         if (route == "/login") {
           TokenStorage().clearAuth();
-          Get.to(ShopNestLogin());
+          Get.offAll(() => Homescreen());
         }
       },
     );

@@ -260,8 +260,20 @@ class _FooterColumn extends StatelessWidget {
       Get.toNamed("/rentclothes");
     } else if (item == "Categories") {
       Get.toNamed("/categories");
+    } else if (item == "About Us") {
+      Get.toNamed("/about");
     } else if (item == "Contact") {
       Get.toNamed("/contact");
+    } else if (item == "Shipping Policy") {
+      Get.toNamed("/shipping-policy");
+    } else if (item == "Returns & Refunds") {
+      Get.toNamed("/returns-refunds");
+    } else if (item == "Privacy Policy") {
+      Get.toNamed("/privacy-policy");
+    } else if (item == "Terms & Conditions") {
+      Get.toNamed("/terms-conditions");
+    } else if (item == "FAQ") {
+      Get.toNamed("/faq");
     }
   }
 

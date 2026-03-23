@@ -26,6 +26,13 @@ class TrendingcollectionCard extends StatelessWidget {
               height: 180,
               width: double.infinity,
               fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                height: 180, // ✅ force same height
+                width: double.infinity,
+                color: Colors.grey[300],
+                alignment: Alignment.center,
+                child: const Icon(Icons.image_not_supported),
+              ),
             ),
           ),
 

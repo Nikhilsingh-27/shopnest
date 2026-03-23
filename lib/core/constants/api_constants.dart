@@ -13,4 +13,6 @@ class ApiConstants {
   static const addcart = "/cart/add";
 
   static const deletecart = "/cart/remove";
+
+  static const trending = "/products/trending";
 }
