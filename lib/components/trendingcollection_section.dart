@@ -57,24 +57,38 @@ class _TrendingcollectionSectionState extends State<TrendingcollectionSection> {
 
         setState(() {
           items.clear();
-          items.addAll(products.map((product) => {
+          items.addAll(
+            products.map(
+              (product) => {
                 "id": product["id"],
                 "title": product["name"],
-                "rent": double.tryParse(product["price"]?.toString() ?? "0") ?? 0,
-                "discount": int.tryParse(product["discount_percent"]?.toString() ?? "0") ?? 0,
+                "rent":
+                    double.tryParse(product["price"]?.toString() ?? "0") ?? 0,
+                "discount":
+                    int.tryParse(
+                      product["discount_percent"]?.toString() ?? "0",
+                    ) ??
+                    0,
                 "finalPrice": product["effective_price"] ?? 0,
-                "image": _getImageUrl(product["images"]),
+                "image": _getImageUrl(
+                  (product["images"] is List && product["images"].isNotEmpty)
+                      ? product["images"][0]
+                      : null,
+                ),
                 "stock": product["stock"],
                 "slug": product["slug"],
                 "category_id": product["category_id"],
                 "category_name": product["category_name"],
                 "original_price": product["original_price"],
                 // Add any other fields needed for SingleproductScreen
-              }));
+              },
+            ),
+          );
         });
       } else {
         setState(() {
-          errorMessage = response["message"] ?? "Failed to load trending products";
+          errorMessage =
+              response["message"] ?? "Failed to load trending products";
         });
       }
     } catch (e) {

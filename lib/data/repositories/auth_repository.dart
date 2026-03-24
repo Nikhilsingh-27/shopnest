@@ -66,32 +66,6 @@ class AuthRepository extends GetxController {
     return response.data;
   }
 
-  Future<Map<String, dynamic>> getallproductsfun({
-    required int page,
-    required int limit,
-  }) async {
-    try {
-      print(page);
-      final response = await dio.get(
-        ApiConstants.products,
-        queryParameters: {"page": page, "limit": limit},
-      );
-
-      // print("Products API Response: ${response.data}");
-
-      if (response.data == null) {
-        throw Exception("Empty response from server");
-      }
-
-      return response.data as Map<String, dynamic>;
-    } on DioException catch (e) {
-      final errorMessage =
-          e.response?.data?["message"] ?? e.message ?? "API error";
-
-      throw Exception(errorMessage);
-    }
-  }
-
   Future<Map<String, dynamic>> getusercarts({required String id}) async {
     try {
       final response = await dio.get(
@@ -156,7 +130,134 @@ class AuthRepository extends GetxController {
       if (response.data == null) {
         throw Exception("Empty response from server");
       }
+      print(response.data);
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final errorMessage =
+          e.response?.data?["message"] ?? e.message ?? "API error";
 
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<Map<String, dynamic>> getallproductsfun({
+    required int page,
+    required int limit,
+  }) async {
+    try {
+      print(page);
+      final response = await dio.get(
+        ApiConstants.products,
+        queryParameters: {"page": page, "limit": limit},
+      );
+
+      // print("Products API Response: ${response.data}");
+
+      if (response.data == null) {
+        throw Exception("Empty response from server");
+      }
+
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final errorMessage =
+          e.response?.data?["message"] ?? e.message ?? "API error";
+
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<Map<String, dynamic>> categorybyid({
+    required dynamic id,
+    required int page,
+    required int limit,
+  }) async {
+    final categoryId = id is String || id is int ? id.toString() : "0";
+
+    try {
+      final response = await dio.get(
+        "${ApiConstants.categories}/$categoryId",
+        queryParameters: {"page": page, "limit": limit},
+        options: Options(extra: {"requiresToken": false}),
+      );
+
+      if (response.data == null) {
+        throw Exception("Empty response from server");
+      }
+
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final errorMessage =
+          e.response?.data?["message"] ?? e.message ?? "API error";
+
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<Map<String, dynamic>> getprofile() async {
+    try {
+      final response = await dio.get(
+        ApiConstants.getprofile,
+        options: Options(extra: {"requiresToken": true}),
+      );
+
+      if (response.data == null) {
+        throw Exception("Empty response from server");
+      }
+      print(response.data);
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final errorMessage =
+          e.response?.data?["message"] ?? e.message ?? "API error";
+
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<Map<String, dynamic>> updateProfile({
+    required String name,
+    required String phone,
+    required String address,
+  }) async {
+    try {
+      final response = await dio.put(
+        ApiConstants.getprofile,
+        data: {"name": name, "phone": phone, "address": address},
+        options: Options(extra: {"requiresToken": true}),
+      );
+
+      if (response.data == null) {
+        throw Exception("Empty response from server");
+      }
+      print(response.data);
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final errorMessage =
+          e.response?.data?["message"] ?? e.message ?? "API error";
+
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<Map<String, dynamic>> updatePassword({
+    required String currPassword,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    try {
+      final response = await dio.post(
+        ApiConstants.updatePassowrd,
+        data: {
+          "current_password": currPassword,
+          "new_password": newPassword,
+          "confirm_password": confirmPassword,
+        },
+        options: Options(extra: {"requiresToken": true}),
+      );
+
+      if (response.data == null) {
+        throw Exception("Empty response from server");
+      }
+      print(response.data);
       return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
       final errorMessage =

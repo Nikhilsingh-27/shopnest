@@ -18,23 +18,45 @@ class _RentclothesScreenState extends State<RentclothesScreen> {
 
   int currentPage = 1;
   int totalPages = 0;
-  int limit = 5;
+  int limit = 2;
 
   bool isLoading = false;
   bool isPageChanging = false;
 
   List<dynamic> productList = [];
+  List<Map<String, dynamic>> categories = [];
 
-  String selectedCategory = "All Categories";
+  String selectedCategoryName = "All Categories";
+  String selectedCategoryId = "0";
 
   @override
   void initState() {
     super.initState();
-    fetchAllProducts();
+    _initializeScreen();
   }
 
-  Future<void> fetchAllProducts({bool reset = false}) async {
+  Future<void> _initializeScreen() async {
+    await fetchCategories();
+    await fetchAllProducts(reset: true);
+  }
+
+  Future<void> fetchCategories() async {
+    try {
+      final data = await repo.getcategoriesfun();
+
+      if (data["success"] == true && data["data"] is List) {
+        final list = List<Map<String, dynamic>>.from(data["data"]);
+        setState(() => categories = list);
+      }
+    } catch (e) {
+      debugPrint("Category fetch error: $e");
+    }
+  }
+
+  Future<void> fetchAllProducts({int page = 1, bool reset = false}) async {
     if (isLoading) return;
+
+    currentPage = page;
 
     setState(() {
       isLoading = true;
@@ -42,17 +64,25 @@ class _RentclothesScreenState extends State<RentclothesScreen> {
     });
 
     try {
-      final data = await repo.getallproductsfun(
-        page: currentPage,
-        limit: limit,
-      );
+      final Map<String, dynamic> data;
 
-      final products = data['data']['products'] as List<dynamic>;
+      if (selectedCategoryId == "0") {
+        data = await repo.getallproductsfun(page: currentPage, limit: limit);
+      } else {
+        data = await repo.categorybyid(
+          id: selectedCategoryId,
+          page: currentPage,
+          limit: limit,
+        );
+      }
+
+      final products = (data["data"]?["products"] as List<dynamic>?) ?? [];
+      final apiTotalPages =
+          (data["data"]?["pagination"]?["total_pages"] as int?) ?? 0;
 
       setState(() {
-        totalPages = data["data"]["pagination"]["total_pages"];
+        totalPages = apiTotalPages;
         productList.addAll(products);
-        print(productList);
       });
     } catch (e) {
       debugPrint("Pagination error: $e");
@@ -64,14 +94,21 @@ class _RentclothesScreenState extends State<RentclothesScreen> {
     }
   }
 
-  Widget categoryButton(String text) {
-    final isSelected = selectedCategory == text;
+  Widget categoryButton(String text, {required String id}) {
+    final isSelected = selectedCategoryId == id;
 
     return GestureDetector(
       onTap: () {
+        if (selectedCategoryId == id) return;
+
         setState(() {
-          selectedCategory = text;
+          selectedCategoryName = text;
+          selectedCategoryId = id;
+          currentPage = 1;
+          isPageChanging = true;
         });
+
+        fetchAllProducts(page: 1, reset: true);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -138,19 +175,16 @@ class _RentclothesScreenState extends State<RentclothesScreen> {
                         child: ListView(
                           scrollDirection: Axis.horizontal,
                           children: [
-                            categoryButton("All Categories"),
+                            categoryButton("All Categories", id: "0"),
                             const SizedBox(width: 10),
-                            categoryButton("Casual Wear"),
-                            const SizedBox(width: 10),
-                            categoryButton("Designer Wear"),
-                            const SizedBox(width: 10),
-                            categoryButton("Party Wear"),
-                            const SizedBox(width: 10),
-                            categoryButton("Traditional Wear"),
-                            const SizedBox(width: 10),
-                            categoryButton("Wedding Wear"),
-                            const SizedBox(width: 10),
-                            categoryButton("Western Wear"),
+                            ...categories.expand((cat) {
+                              final name = cat["name"]?.toString() ?? "Unknown";
+                              final id = cat["id"]?.toString() ?? "0";
+                              return [
+                                categoryButton(name, id: id),
+                                const SizedBox(width: 10),
+                              ];
+                            }).toList(),
                           ],
                         ),
                       ),
@@ -190,7 +224,7 @@ class _RentclothesScreenState extends State<RentclothesScreen> {
                             isPageChanging = true;
                           });
 
-                          fetchAllProducts(reset: true);
+                          fetchAllProducts(page: page, reset: true);
                         },
                       ),
                     ),

@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:shopnest/components/main_layout_drawer.dart';
 import 'package:shopnest/components/shopfooter_section.dart';
 import 'package:shopnest/components/wishlist_card.dart';
+import 'package:shopnest/components/custom_snackbar.dart';
+import 'package:shopnest/data/repositories/auth_repository.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,21 +14,26 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final TextEditingController nameController = TextEditingController(
-    text: "Nikhil",
-  );
+  final AuthRepository repo = Get.find<AuthRepository>();
 
-  final TextEditingController emailController = TextEditingController(
-    text: "unidentifiedemail1597@gmail.com",
-  );
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
 
-  final TextEditingController phoneController = TextEditingController(
-    text: "9315885136",
-  );
+  final TextEditingController currentPasswordController =
+      TextEditingController();
+  final TextEditingController newPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
-  final TextEditingController addressController = TextEditingController(
-    text: "noida",
-  );
+  bool isUpdatingProfile = false;
+  bool isUpdatingPassword = false;
+
+  String? currentPasswordError;
+  String? newPasswordError;
+  String? confirmPasswordError;
+
   final List<Map<String, dynamic>> productlist = [
     {
       "image": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d",
@@ -61,10 +68,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
 
+    _loadProfile();
+
     final args = Get.arguments;
 
     if (args != null && args["select"] != null) {
       selectedMenu = args["select"];
+    }
+  }
+
+  Future<void> _loadProfile() async {
+    try {
+      final response = await repo.getprofile();
+      if (response["success"] == true && response["data"] != null) {
+        final userData = response["data"] as Map<String, dynamic>;
+
+        setState(() {
+          nameController.text = userData["name"]?.toString() ?? "";
+          emailController.text = userData["email"]?.toString() ?? "";
+          phoneController.text = userData["phone"]?.toString() ?? "";
+          addressController.text = userData["address"]?.toString() ?? "";
+        });
+      }
+    } catch (e) {
+      debugPrint("Failed to load profile: $e");
     }
   }
 
@@ -251,10 +278,80 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
+                              disabledBackgroundColor: Colors.orange.shade200,
                             ),
-                            onPressed: () {},
-                            icon: const Icon(Icons.save),
-                            label: const Text("Update Profile"),
+                            onPressed: isUpdatingProfile
+                                ? null
+                                : () async {
+                                    if (isUpdatingProfile) return;
+
+                                    setState(() {
+                                      isUpdatingProfile = true;
+                                    });
+
+                                    try {
+                                      final result = await repo.updateProfile(
+                                        name: nameController.text.trim(),
+                                        phone: phoneController.text.trim(),
+                                        address: addressController.text.trim(),
+                                      );
+
+                                      if (result["success"] == true) {
+                                        CustomSnackbar.showSuccess(
+                                          result["message"] ??
+                                              "Profile updated successfully",
+                                        );
+
+                                        /// Optionally refresh profile from server.
+                                        await _loadProfile();
+
+                                        /// Wait for snackbar to disappear (3 seconds)
+                                        await Future.delayed(
+                                          const Duration(seconds: 3),
+                                        );
+                                      } else {
+                                        CustomSnackbar.showError(
+                                          result["message"] ??
+                                              "Unable to update profile",
+                                        );
+
+                                        /// Wait for snackbar to disappear (3 seconds)
+                                        await Future.delayed(
+                                          const Duration(seconds: 3),
+                                        );
+                                      }
+                                    } catch (e) {
+                                      CustomSnackbar.showError(
+                                        "Update failed: ${e.toString()}",
+                                      );
+
+                                      /// Wait for snackbar to disappear (3 seconds)
+                                      await Future.delayed(
+                                        const Duration(seconds: 3),
+                                      );
+                                    } finally {
+                                      if (mounted) {
+                                        setState(() {
+                                          isUpdatingProfile = false;
+                                        });
+                                      }
+                                    }
+                                  },
+                            icon: isUpdatingProfile
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : const Icon(Icons.save),
+                            label: isUpdatingProfile
+                                ? const Text("Updating...")
+                                : const Text("Update Profile"),
                           ),
                         ],
                       ),
@@ -292,20 +389,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           _inputField(
                             "Current Password",
-                            TextEditingController(),
+                            currentPasswordController,
                             obscure: true,
+                            errorText: currentPasswordError,
+                            onChanged: (_) {
+                              setState(() => currentPasswordError = null);
+                            },
                           ),
 
                           _inputField(
                             "New Password",
-                            TextEditingController(),
+                            newPasswordController,
                             obscure: true,
+                            errorText: newPasswordError,
+                            onChanged: (_) {
+                              setState(() => newPasswordError = null);
+                            },
                           ),
 
                           _inputField(
                             "Confirm New Password",
-                            TextEditingController(),
+                            confirmPasswordController,
                             obscure: true,
+                            errorText: confirmPasswordError,
+                            onChanged: (_) {
+                              setState(() => confirmPasswordError = null);
+                            },
                           ),
 
                           const SizedBox(height: 15),
@@ -320,10 +429,142 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
+                              disabledBackgroundColor: Colors.orange.shade200,
                             ),
-                            onPressed: () {},
-                            icon: const Icon(Icons.key),
-                            label: const Text("Change Password"),
+                            onPressed: isUpdatingPassword
+                                ? null
+                                : () async {
+                                    if (isUpdatingPassword) return;
+
+                                    /// Clear previous errors
+                                    setState(() {
+                                      currentPasswordError = null;
+                                      newPasswordError = null;
+                                      confirmPasswordError = null;
+                                    });
+
+                                    /// Validation
+                                    bool isValid = true;
+                                    final currPass = currentPasswordController
+                                        .text
+                                        .trim();
+                                    final newPass = newPasswordController.text
+                                        .trim();
+                                    final confirmPass =
+                                        confirmPasswordController.text.trim();
+
+                                    if (currPass.isEmpty) {
+                                      setState(() {
+                                        currentPasswordError =
+                                            "Current password is required";
+                                      });
+                                      isValid = false;
+                                    }
+
+                                    if (newPass.isEmpty) {
+                                      setState(() {
+                                        newPasswordError =
+                                            "New password is required";
+                                      });
+                                      isValid = false;
+                                    } else if (newPass.length < 6) {
+                                      setState(() {
+                                        newPasswordError =
+                                            "Password must be at least 6 characters";
+                                      });
+                                      isValid = false;
+                                    }
+
+                                    if (confirmPass.isEmpty) {
+                                      setState(() {
+                                        confirmPasswordError =
+                                            "Confirm password is required";
+                                      });
+                                      isValid = false;
+                                    }
+
+                                    if (isValid && newPass != confirmPass) {
+                                      setState(() {
+                                        confirmPasswordError =
+                                            "Passwords do not match";
+                                      });
+                                      isValid = false;
+                                    }
+
+                                    if (!isValid) {
+                                      return;
+                                    }
+
+                                    setState(() {
+                                      isUpdatingPassword = true;
+                                    });
+
+                                    try {
+                                      final result = await repo.updatePassword(
+                                        currPassword: currentPasswordController
+                                            .text
+                                            .trim(),
+                                        newPassword: newPasswordController.text
+                                            .trim(),
+                                        confirmPassword:
+                                            confirmPasswordController.text
+                                                .trim(),
+                                      );
+
+                                      if (result["success"] == true) {
+                                        CustomSnackbar.showSuccess(
+                                          result["message"] ??
+                                              "Password changed successfully",
+                                        );
+
+                                        currentPasswordController.clear();
+                                        newPasswordController.clear();
+                                        confirmPasswordController.clear();
+
+                                        await Future.delayed(
+                                          const Duration(seconds: 3),
+                                        );
+                                      } else {
+                                        CustomSnackbar.showError(
+                                          result["message"] ??
+                                              "Unable to change password",
+                                        );
+
+                                        await Future.delayed(
+                                          const Duration(seconds: 3),
+                                        );
+                                      }
+                                    } catch (e) {
+                                      CustomSnackbar.showError(
+                                        "Error: ${e.toString()}",
+                                      );
+
+                                      await Future.delayed(
+                                        const Duration(seconds: 3),
+                                      );
+                                    } finally {
+                                      if (mounted) {
+                                        setState(() {
+                                          isUpdatingPassword = false;
+                                        });
+                                      }
+                                    }
+                                  },
+                            icon: isUpdatingPassword
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : const Icon(Icons.key),
+                            label: isUpdatingPassword
+                                ? const Text("Changing...")
+                                : const Text("Change Password"),
                           ),
                         ],
                       ),
@@ -678,18 +919,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bool enabled = true,
     int maxLines = 1,
     bool obscure = false,
+    String? errorText,
+    Function(String)? onChanged,
   }) {
+    final hasError = errorText != null && errorText.isNotEmpty;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
-      child: TextField(
-        controller: controller,
-        enabled: enabled,
-        obscureText: obscure,
-        maxLines: maxLines,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: controller,
+            enabled: enabled,
+            obscureText: obscure,
+            maxLines: maxLines,
+            onChanged: onChanged,
+            decoration: InputDecoration(
+              labelText: label,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: hasError ? Colors.red : Colors.grey,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: hasError ? Colors.red : Colors.grey.shade300,
+                  width: hasError ? 2 : 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: hasError ? Colors.red : Colors.orange,
+                  width: 2,
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.red, width: 2),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.red, width: 2),
+              ),
+            ),
+          ),
+          if (hasError)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                errorText!,
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

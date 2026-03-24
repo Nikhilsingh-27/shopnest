@@ -15,4 +15,7 @@ class ApiConstants {
   static const deletecart = "/cart/remove";
 
   static const trending = "/products/trending";
+
+  static const getprofile = "/user/profile";
+  static const updatePassowrd = "/user/change-password";
 }

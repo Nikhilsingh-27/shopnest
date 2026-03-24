@@ -31,7 +31,14 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
     final securityDeposit = item["security_deposit"] ?? "0";
     final discount = item["discount_percent"] ?? 0;
     final price = item["price"] ?? "0";
-    final image = _getImageUrl(item["images"]);
+    final images = item["images"];
+
+    String? imageName;
+    if (images is List && images.isNotEmpty) {
+      imageName = images[0];
+    }
+
+    final image = _getImageUrl(imageName);
     final id = item["id"].toString();
 
     return Container(
