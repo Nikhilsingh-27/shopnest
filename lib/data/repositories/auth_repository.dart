@@ -61,7 +61,13 @@ class AuthRepository extends GetxController {
     print(response);
     if (response.data["success"] == true) {
       final data = response.data["data"];
-      categories.value = List<Map<String, dynamic>>.from(data);
+      if (data != null) {
+        categories.value = List<Map<String, dynamic>>.from(data)
+            .where((item) => item != null)
+            .toList();
+      } else {
+        categories.value = [];
+      }
     }
     return response.data;
   }

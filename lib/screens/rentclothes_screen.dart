@@ -32,6 +32,14 @@ class _RentclothesScreenState extends State<RentclothesScreen> {
   @override
   void initState() {
     super.initState();
+
+    final args = Get.arguments;
+
+    if (args != null) {
+      selectedCategoryId = args["categoryId"] ?? "0";
+      selectedCategoryName = args["categoryName"] ?? "All Categories";
+    }
+
     _initializeScreen();
   }
 
