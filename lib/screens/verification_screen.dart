@@ -1,6 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:shopnest/components/custom_snackbar.dart';
 import 'package:shopnest/components/main_layout_drawer.dart';
 import 'package:shopnest/components/shopfooter_section.dart';
+import 'package:shopnest/data/repositories/profile_service.dart';
+import 'package:shopnest/screens/homescreen.dart';
 
 class VerificationScreen extends StatefulWidget {
   const VerificationScreen({super.key});
@@ -17,13 +24,33 @@ class _VerificationScreenState extends State<VerificationScreen> {
   final TextEditingController dobController = TextEditingController();
 
   String? selectedIdType;
+  File? selectedFile;
   String? selectedFileName;
 
+  final ProfileService _profileService = ProfileService();
+  bool isLoading = false;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> pickImage() async {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70, // compress (good for KYC)
+    );
+
+    if (image != null) {
+      setState(() {
+        selectedFile = File(image.path);
+        selectedFileName = image.name;
+      });
+    }
+  }
+
   List<String> idTypes = [
-    "Aadhar Card",
+    "Aadhaar Card",
     "PAN Card",
     "Passport",
     "Driving License",
+    "Voter ID",
   ];
 
   Future<void> pickDate() async {
@@ -35,22 +62,45 @@ class _VerificationScreenState extends State<VerificationScreen> {
     );
 
     if (pickedDate != null) {
-      dobController.text =
-          "${pickedDate.month}/${pickedDate.day}/${pickedDate.year}";
+      final formattedDate =
+          "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+
+      dobController.text = formattedDate;
     }
   }
 
-  void submitForm() {
-    if (_formKey.currentState!.validate() && selectedFileName != null) {
-      print("ID Type: $selectedIdType");
-      print("Document Number: ${documentController.text}");
-      print("Full Name: ${nameController.text}");
-      print("DOB: ${dobController.text}");
-      print("File: $selectedFileName");
-    } else if (selectedFileName == null) {
+  void submitForm() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    if (selectedFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please upload front side image")),
       );
+      return;
+    }
+
+    try {
+      setState(() => isLoading = true);
+
+      final response = await _profileService.submitKycForm(
+        idType: selectedIdType!,
+        documentNumber: documentController.text,
+        fullName: nameController.text,
+        dob: dobController.text,
+        frontImage: selectedFile!,
+      );
+
+      // ✅ CUSTOM SUCCESS SNACKBAR
+      CustomSnackbar.showSuccess(
+        response["message"] ?? "KYC Submitted Successfully",
+      );
+      Get.offAll(Homescreen()); // or your HomeScreen
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() => isLoading = false);
     }
   }
 
@@ -207,11 +257,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                             child: Row(
                               children: [
                                 ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      selectedFileName = "id_image.jpg";
-                                    });
-                                  },
+                                  onPressed: pickImage,
                                   child: const Text("Choose file"),
                                 ),
                                 const SizedBox(width: 10),

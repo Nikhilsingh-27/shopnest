@@ -6,6 +6,7 @@ import 'package:shopnest/components/main_layout_drawer.dart';
 import 'package:shopnest/components/shopfooter_section.dart';
 import 'package:shopnest/components/stats_section.dart';
 import 'package:shopnest/components/trendingcollection_section.dart';
+import 'package:shopnest/core/storage/token_storage.dart';
 import 'package:shopnest/data/repositories/auth_repository.dart';
 
 class Homescreen extends StatefulWidget {
@@ -40,6 +41,10 @@ class _HomescreenState extends State<Homescreen> {
 
   @override
   Widget build(BuildContext context) {
+    final storage = TokenStorage();
+
+    var user = storage.getUser();
+
     final width = MediaQuery.of(context).size.width;
     final bool isMobile = width < 700;
 

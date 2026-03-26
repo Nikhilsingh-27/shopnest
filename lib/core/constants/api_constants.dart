@@ -18,4 +18,9 @@ class ApiConstants {
 
   static const getprofile = "/user/profile";
   static const updatePassowrd = "/user/change-password";
+
+  static const chekout = "/orders/checkout";
+  static const verify = "/orders/verify-payment";
+
+  static const useridverfiy = "/user/verify-id";
 }

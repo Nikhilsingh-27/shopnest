@@ -90,6 +90,8 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
     final storage = TokenStorage();
 
     var user = storage.getUser();
+    bool check = user?["id_verified"] ?? false;
+
     return SafeArea(
       child: Drawer(
         width: 270,
@@ -163,15 +165,17 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.orange,
+                          color: check ? Colors.green : Colors.orange,
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Text(
-                          "Unverified",
-                          style: TextStyle(color: Colors.white, fontSize: 11),
+                        child: Text(
+                          check ? "Verified" : "Unverified",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                          ),
                         ),
                       ),
-
                       const Spacer(),
 
                       Icon(
@@ -210,12 +214,12 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.orange,
+                                  color: check ? Colors.green : Colors.orange,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
-                                child: const Text(
-                                  "Unverified",
-                                  style: TextStyle(
+                                child: Text(
+                                  check ? "Verified" : "Unverified",
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 11,
                                   ),
@@ -238,19 +242,29 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
                                     ),
 
                                     const SizedBox(height: 6),
-
-                                    InkWell(
-                                      onTap: () {
-                                        Get.toNamed("/verify");
-                                      },
-                                      child: const Text(
-                                        "Manage verification",
-                                        style: TextStyle(
-                                          color: Colors.blue,
-                                          fontSize: 15,
+                                    if (check == false) ...[
+                                      InkWell(
+                                        onTap: () {
+                                          Get.toNamed("/verify");
+                                        },
+                                        child: const Text(
+                                          "Manage verification",
+                                          style: TextStyle(
+                                            color: Colors.blue,
+                                            fontSize: 15,
+                                          ),
                                         ),
                                       ),
-                                    ),
+                                    ] else ...[
+                                      const Text(
+                                        "Verified ✅",
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ],
                                 ),
                               ),
