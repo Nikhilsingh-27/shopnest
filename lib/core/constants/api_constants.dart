@@ -23,4 +23,14 @@ class ApiConstants {
   static const verify = "/orders/verify-payment";
 
   static const useridverfiy = "/user/verify-id";
+
+  static const getaddress = "/user/addresses";
+  static const setdefaultaddress = "/user/addresses/set-default";
+  static const deleteaddress = "/user/addresses/delete";
+  static const addaddress = "/user/addresses/add";
+  static const updateaddress = "/user/addresses/update/";
+
+  static const addwishlist = "/wishlist/add";
+  static const getwishlist = "/wishlist";
+  static const deltewishlist = "/wishlist/remove";
 }

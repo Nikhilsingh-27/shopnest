@@ -1,15 +1,112 @@
 import 'package:flutter/material.dart';
+import 'package:shopnest/components/custom_snackbar.dart';
+import 'package:shopnest/data/repositories/auth_repository.dart';
 
-class WishlistCard extends StatelessWidget {
+class WishlistCard extends StatefulWidget {
+  final VoidCallback onDelete;
   final Map<String, dynamic> item;
 
-  const WishlistCard({super.key, required this.item});
+  const WishlistCard({super.key, required this.item, required this.onDelete});
+
+  @override
+  State<WishlistCard> createState() => _WishlistCardState();
+}
+
+class _WishlistCardState extends State<WishlistCard> {
+  bool isAddingToCart = false; // ✅ loading state
+
+  int quantity = 1;
+
+  Future<void> addToCart(int quantityToAdd) async {
+    if (isAddingToCart) return; // ✅ prevent multiple clicks
+
+    setState(() {
+      isAddingToCart = true;
+    });
+
+    final productId = widget.item["product_id"];
+
+    if (productId == null || productId == 0) {
+      CustomSnackbar.showError("Product ID missing, cannot add to cart.");
+      setState(() => isAddingToCart = false);
+      return;
+    }
+
+    try {
+      final response = await AuthRepository().addcartfun(
+        id: productId.toString(),
+        quantity: quantityToAdd.toString(),
+      );
+
+      if (response["success"] == true) {
+        CustomSnackbar.showSuccess("Product added to cart successfully");
+      } else {
+        CustomSnackbar.showError(
+          response["message"] ?? "Failed to add item to cart",
+        );
+      }
+    } catch (e) {
+      CustomSnackbar.showError("Error adding to cart: $e");
+    }
+
+    // ✅ wait for snackbar duration (~3 sec)
+    await Future.delayed(const Duration(seconds: 3));
+
+    if (mounted) {
+      setState(() {
+        isAddingToCart = false;
+      });
+    }
+  }
+
+  Future<void> deletewishlist() async {
+    final productId = widget.item["product_id"];
+
+    if (productId == null || productId == 0) {
+      CustomSnackbar.showError("Product ID missing, cannot Delete.");
+      return;
+    }
+
+    try {
+      final response = await AuthRepository().deletewishlist(
+        id: productId.toString(),
+      );
+
+      if (response["success"] == true) {
+        CustomSnackbar.showSuccess("Product removed successfully");
+        widget.onDelete();
+      } else {
+        CustomSnackbar.showError(
+          response["message"] ?? "Failed to remove item",
+        );
+      }
+    } catch (e) {
+      CustomSnackbar.showError("Error in removing: $e");
+    }
+  }
+
+  String? _asString(dynamic value) => value == null ? null : value.toString();
+
+  String _getImageUrl(String? imageName) {
+    const String baseUrl = "https://www.dizaartdemo.com/";
+    const String defaultImage = "${baseUrl}public/front/assets/img/list-8.jpg";
+
+    if (imageName == null || imageName.trim().isEmpty) return defaultImage;
+
+    final imageFile = imageName.split('/').last;
+    if (imageFile.isEmpty) return defaultImage;
+
+    return "${baseUrl}demo/shopnest/assets/images/products/$imageFile";
+  }
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = _getImageUrl(
+      _asString(widget.item["images"] ?? widget.item["image"]),
+    );
+
     return Container(
       width: double.infinity,
-
       margin: const EdgeInsets.only(bottom: 18),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -27,12 +124,19 @@ class WishlistCard extends StatelessWidget {
         children: [
           /// IMAGE
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
-            child: Image.network(
-              item["image"],
-              height: 250,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            child: SizedBox(
+              height: 220,
               width: double.infinity,
-              fit: BoxFit.cover,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: Colors.grey[300],
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.image_not_supported),
+                ),
+              ),
             ),
           ),
 
@@ -42,108 +146,18 @@ class WishlistCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// TITLE
                 Text(
-                  item["title"],
+                  widget.item["name"],
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
 
-                const SizedBox(height: 8),
-
-                /// SIZE
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.straighten,
-                      size: 18,
-                      color: Colors.black54,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      "Size: ${item["size"]}",
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-
-                /// COLOR
-                Row(
-                  children: [
-                    const Icon(Icons.palette, size: 18, color: Colors.black54),
-                    const SizedBox(width: 6),
-                    Text(
-                      "Color: ${item["color"]}",
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
-
                 const SizedBox(height: 10),
 
-                /// RENT
-                RichText(
-                  text: TextSpan(
-                    style: const TextStyle(fontSize: 15, color: Colors.black87),
-                    children: [
-                      const TextSpan(
-                        text: "Rental: ",
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      TextSpan(text: "₹${item["rent"]}.00/day"),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 4),
-
-                /// SECURITY
-                RichText(
-                  text: TextSpan(
-                    style: const TextStyle(fontSize: 15, color: Colors.black87),
-                    children: [
-                      const TextSpan(
-                        text: "Security: ",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const TextSpan(text: "₹2,500.00"),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 4),
-
-                /// DISCOUNT
-                RichText(
-                  text: TextSpan(
-                    style: const TextStyle(fontSize: 15, color: Colors.black87),
-                    children: [
-                      const TextSpan(
-                        text: "Discount: ",
-                        style: TextStyle(
-                          color: Colors.orange,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      TextSpan(text: "${item["discount"]}%"),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                /// FINAL PRICE
                 Text(
-                  "₹${item["finalPrice"]}.00/day",
+                  "₹${widget.item["effective_price"]}.00/day",
                   style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
@@ -153,32 +167,48 @@ class WishlistCard extends StatelessWidget {
 
                 const SizedBox(height: 14),
 
-                /// BUTTONS
                 Row(
                   children: [
                     /// ADD TO CART
                     Expanded(
                       flex: 2,
-                      child: ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.add_shopping_cart),
-                        label: const Text("Add to Cart"),
+                      child: ElevatedButton(
+                        onPressed: isAddingToCart
+                            ? null
+                            : () => addToCart(quantity),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          backgroundColor: Color(0xFFff713b),
+                          backgroundColor: const Color(0xFFff713b),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25),
                           ),
                         ),
+                        child: isAddingToCart
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.add_shopping_cart),
+                                  SizedBox(width: 6),
+                                  Text("Add to Cart"),
+                                ],
+                              ),
                       ),
                     ),
 
                     const SizedBox(width: 12),
 
-                    /// Delete BUTTON
+                    /// DELETE
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () {},
+                        onPressed: deletewishlist,
                         icon: const Icon(Icons.delete, color: Colors.white),
                         label: const Text(
                           "Delete",
@@ -186,10 +216,8 @@ class WishlistCard extends StatelessWidget {
                         ),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          backgroundColor: Colors.red, // background color
-                          side: const BorderSide(
-                            color: Colors.red,
-                          ), // border color
+                          backgroundColor: Colors.red,
+                          side: const BorderSide(color: Colors.red),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),

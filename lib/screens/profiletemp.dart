@@ -36,37 +36,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? newPasswordError;
   String? confirmPasswordError;
 
-  // final List<Map<String, dynamic>> productlist = [
-  //   {
-  //     "image": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d",
-  //     "title": "Wedding Lehenga",
-  //     "size": "M",
-  //     "color": "Pink",
-  //     "rent": 5000,
-  //     "discount": 30,
-  //     "finalPrice": 3500,
-  //   },
-  //   {
-  //     "image": "https://images.unsplash.com/photo-1523381294911-8d3cead13475",
-  //     "title": "Casual Hoodie",
-  //     "size": "L",
-  //     "color": "Green",
-  //     "rent": 900,
-  //     "discount": 8,
-  //     "finalPrice": 828,
-  //   },
-  //   {
-  //     "image": "https://images.unsplash.com/photo-1509631179647-0177331693ae",
-  //     "title": "Formal Suit",
-  //     "size": "XL",
-  //     "color": "Navy Blue",
-  //     "rent": 3200,
-  //     "discount": 20,
-  //     "finalPrice": 2560,
-  //   },
-  // ];
+  final List<Map<String, dynamic>> productlist = [
+    {
+      "image": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d",
+      "title": "Wedding Lehenga",
+      "size": "M",
+      "color": "Pink",
+      "rent": 5000,
+      "discount": 30,
+      "finalPrice": 3500,
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1523381294911-8d3cead13475",
+      "title": "Casual Hoodie",
+      "size": "L",
+      "color": "Green",
+      "rent": 900,
+      "discount": 8,
+      "finalPrice": 828,
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1509631179647-0177331693ae",
+      "title": "Formal Suit",
+      "size": "XL",
+      "color": "Navy Blue",
+      "rent": 3200,
+      "discount": 20,
+      "finalPrice": 2560,
+    },
+  ];
   // bool argsLoaded = false;
-  List<dynamic> wishlistlist = [];
+
   List<dynamic> addressList = [];
   bool isLoading = true;
   Future<void> fetchAddresses() async {
@@ -82,24 +82,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> fetchwishlist() async {
-    try {
-      final res = await repo.getwishlistfun();
-      wishlistlist = res['data'] ?? [];
-    } catch (e) {
-      print(e);
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     fetchAddresses();
-    fetchwishlist();
     _loadProfile();
 
     final args = Get.arguments;
@@ -722,13 +708,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 0),
                             child: Column(
-                              children: wishlistlist.map((product) {
+                              children: productlist.map((product) {
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 16),
-                                  child: WishlistCard(
-                                    item: product,
-                                    onDelete: fetchwishlist,
-                                  ),
+                                  child: WishlistCard(item: product),
                                 );
                               }).toList(),
                             ),

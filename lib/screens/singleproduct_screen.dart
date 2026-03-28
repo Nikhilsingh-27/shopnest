@@ -33,6 +33,26 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
     return "${baseUrl}demo/shopnest/assets/images/products/$imageFile";
   }
 
+  Future<void> addTowishlist() async {
+    final productId = _nonNull(widget.item["id"], "");
+    if (productId.isEmpty) {
+      CustomSnackbar.showError("Product ID missing, cannot add to Wishlist.");
+      return;
+    }
+    try {
+      final response = await AuthRepository().addwishlistfun(id: productId);
+      if (response["success"] == true) {
+        CustomSnackbar.showSuccess("Product added to Wishlist successfully");
+      } else {
+        CustomSnackbar.showError(
+          response["message"] ?? "Failed to add item to Wishlist",
+        );
+      }
+    } catch (e) {
+      CustomSnackbar.showError("Error adding to cart: $e");
+    }
+  }
+
   Future<void> addToCart(int quantityToAdd) async {
     final productId = _nonNull(widget.item["id"], "");
     if (productId.isEmpty) {
@@ -311,7 +331,9 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
                         child: SizedBox(
                           height: 50,
                           child: OutlinedButton.icon(
-                            onPressed: () {},
+                            onPressed: () {
+                              addTowishlist();
+                            },
                             icon: const Icon(Icons.favorite, color: Colors.red),
                             label: const Text(
                               "Add to Wishlist",
