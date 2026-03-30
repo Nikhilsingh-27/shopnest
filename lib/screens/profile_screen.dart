@@ -7,6 +7,7 @@ import 'package:shopnest/components/wishlist_card.dart';
 import 'package:shopnest/data/repositories/auth_repository.dart';
 import 'package:shopnest/screens/addAddress_screen.dart';
 import 'package:shopnest/screens/editaddress_screen.dart';
+import 'package:shopnest/screens/rentaldetail_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -36,36 +37,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? newPasswordError;
   String? confirmPasswordError;
 
-  // final List<Map<String, dynamic>> productlist = [
-  //   {
-  //     "image": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d",
-  //     "title": "Wedding Lehenga",
-  //     "size": "M",
-  //     "color": "Pink",
-  //     "rent": 5000,
-  //     "discount": 30,
-  //     "finalPrice": 3500,
-  //   },
-  //   {
-  //     "image": "https://images.unsplash.com/photo-1523381294911-8d3cead13475",
-  //     "title": "Casual Hoodie",
-  //     "size": "L",
-  //     "color": "Green",
-  //     "rent": 900,
-  //     "discount": 8,
-  //     "finalPrice": 828,
-  //   },
-  //   {
-  //     "image": "https://images.unsplash.com/photo-1509631179647-0177331693ae",
-  //     "title": "Formal Suit",
-  //     "size": "XL",
-  //     "color": "Navy Blue",
-  //     "rent": 3200,
-  //     "discount": 20,
-  //     "finalPrice": 2560,
-  //   },
-  // ];
-  // bool argsLoaded = false;
+  List<Map<String, dynamic>> allRentals = [];
+  List<Map<String, dynamic>> activeRentals = [];
+  List<Map<String, dynamic>> pastRentals = [];
+
+  Map<String, List<Map<String, dynamic>>> separateRentals(
+    Map<String, dynamic> response,
+  ) {
+    final List rentals = response["data"]["all"] ?? [];
+
+    for (var rental in rentals) {
+      final status = (rental["status"] ?? "").toString().toLowerCase();
+
+      // Add to ALL
+      allRentals.add(Map<String, dynamic>.from(rental));
+
+      // ACTIVE → shipped or paid
+      if (status == "shipped" || status == "paid") {
+        activeRentals.add(Map<String, dynamic>.from(rental));
+      }
+      // PAST → delivered or canceled
+      else if (status == "delivered" || status == "cancelled") {
+        pastRentals.add(Map<String, dynamic>.from(rental));
+      }
+    }
+
+    return {"all": allRentals, "active": activeRentals, "past": pastRentals};
+  }
+
+  List all = [];
+  List active = [];
+  List past = [];
   List<dynamic> wishlistlist = [];
   List<dynamic> addressList = [];
   bool isLoading = true;
@@ -95,9 +97,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> fetchAndSeparateRentals() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await repo.getrentalstatusfun();
+
+      final separatedData = separateRentals(response);
+      print(separatedData);
+      setState(() {
+        allRentals = separatedData["all"]!;
+        activeRentals = separatedData["active"]!;
+        pastRentals = separatedData["past"]!;
+      });
+      print(allRentals);
+      print("--------------------");
+      print(activeRentals);
+      print("-------------------");
+      print(pastRentals);
+    } catch (e) {
+      print("Error: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    //fetchAndSeparateRentals();
     fetchAddresses();
     fetchwishlist();
     _loadProfile();
@@ -784,7 +816,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 20),
 
                     /// FILTER BUTTONS
-                    const RentalFilterButtons(),
+                    RentalFilterButtons(),
                   ],
                 ],
               ),
@@ -1367,28 +1399,124 @@ class RentalFilterButtons extends StatefulWidget {
 }
 
 class _RentalFilterButtonsState extends State<RentalFilterButtons> {
-  List rentals = [
-    {
-      "orderId": "000011",
-      "status": "Delivered",
-      "price": "₹1,312.04",
-      "date": "March 7, 2026",
-      "items": "3 items",
-      "borderColor": Colors.teal,
-    },
-    {
-      "orderId": "000010",
-      "status": "Paid",
-      "price": "₹3,341.64",
-      "date": "March 7, 2026",
-      "items": "4 items",
-      "borderColor": Colors.grey,
-    },
-  ];
+  Widget buildRentalList(
+    List<Map<String, dynamic>> rentals,
+    Widget emptyWidget,
+  ) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
+    if (rentals.isEmpty) {
+      return emptyWidget;
+    }
+
+    return Column(
+      children: rentals.map((rental) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: RentalOrderCard(
+            orderId: rental["id"].toString(),
+            status: rental["status"],
+            price: rental["total_price"],
+            date: rental["start_date"],
+            items: getTotalItemCount(rental["items"]),
+            borderColor: Colors.grey,
+            onViewDetails: () {
+              Get.to(
+                () => RentalDetailsScreen(
+                  items: List<Map<String, dynamic>>.from(rental["items"]),
+                  orderId: rental["id"].toString(),
+                ),
+              );
+            },
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  String getTotalItemCount(List<dynamic> items) {
+    int total = 0;
+
+    for (var item in items) {
+      total += int.tryParse(item['quantity'].toString()) ?? 0;
+    }
+
+    return total.toString();
+  }
+
+  bool isLoading = true;
   String selectedFilter = "All Rentals";
 
   final List<String> filters = ["All Rentals", "Active", "Upcoming", "Past"];
+  List<Map<String, dynamic>> allRentals = [];
+  List<Map<String, dynamic>> activeRentals = [];
+  List<Map<String, dynamic>> pastRentals = [];
+  List<Map<String, dynamic>> upcomingRentals = [];
+
+  final AuthRepository repo = Get.find<AuthRepository>();
+
+  Map<String, List<Map<String, dynamic>>> separateRentals(
+    Map<String, dynamic> response,
+  ) {
+    final List rentals = response["data"]["all"] ?? [];
+
+    for (var rental in rentals) {
+      final status = (rental["status"] ?? "").toString().toLowerCase();
+
+      // Add to ALL
+      allRentals.add(Map<String, dynamic>.from(rental));
+
+      // ACTIVE → shipped or paid
+      if (status == "shipped" || status == "paid") {
+        activeRentals.add(Map<String, dynamic>.from(rental));
+      }
+      // PAST → delivered or canceled
+      else if (status == "delivered" || status == "cancelled") {
+        pastRentals.add(Map<String, dynamic>.from(rental));
+      } else if (status == "pending") {
+        upcomingRentals.add(Map<String, dynamic>.from(rental));
+      }
+    }
+
+    return {"all": allRentals, "active": activeRentals, "past": pastRentals};
+  }
+
+  Future<void> fetchAndSeparateRentals() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await repo.getrentalstatusfun();
+
+      final separatedData = separateRentals(response);
+      print(separatedData);
+      setState(() {
+        allRentals = separatedData["all"]!;
+        activeRentals = separatedData["active"]!;
+        pastRentals = separatedData["past"]!;
+      });
+      print(allRentals);
+      print("--------------------");
+      print(activeRentals);
+      print("-------------------");
+      print(pastRentals);
+    } catch (e) {
+      print("Error: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAndSeparateRentals();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1438,25 +1566,20 @@ class _RentalFilterButtonsState extends State<RentalFilterButtons> {
 
         /// RENTAL CARDS
         if (selectedFilter == "All Rentals") ...[
-          ...rentals.map(
-            (rental) => Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: RentalOrderCard(
-                orderId: rental["orderId"],
-                status: rental["status"],
-                price: rental["price"],
-                date: rental["date"],
-                items: rental["items"],
-                borderColor: rental["borderColor"],
-                onViewDetails: () {},
-              ),
-            ),
-          ),
+          buildRentalList(allRentals, const NoActiveRentals()),
         ],
 
-        if (selectedFilter == "Active") ...[const NoActiveRentals()],
-        if (selectedFilter == "Upcoming") ...[const NoUpcomingRentals()],
-        if (selectedFilter == "Past") ...[const NoPastRentals()],
+        if (selectedFilter == "Active") ...[
+          buildRentalList(activeRentals, const NoActiveRentals()),
+        ],
+
+        if (selectedFilter == "Upcoming") ...[
+          buildRentalList(upcomingRentals, const NoUpcomingRentals()),
+        ],
+
+        if (selectedFilter == "Past") ...[
+          buildRentalList(pastRentals, const NoPastRentals()),
+        ],
         const SizedBox(height: 20),
 
         /// NEED HELP SECTION
@@ -1670,7 +1793,7 @@ class RentalOrderCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          "ORDER #$orderId",
+                          "ORDER #0000$orderId",
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
@@ -1724,7 +1847,7 @@ class RentalOrderCard extends StatelessWidget {
                     children: [
                       const Icon(Icons.checkroom, size: 18),
                       const SizedBox(width: 6),
-                      Text(items),
+                      Text("$items items"),
                     ],
                   ),
 

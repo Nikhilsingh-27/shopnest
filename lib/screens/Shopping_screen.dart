@@ -11,20 +11,18 @@ import 'package:shopnest/core/storage/token_storage.dart';
 import 'package:shopnest/data/repositories/auth_repository.dart';
 import 'package:shopnest/modules/controllers/mod_controller.dart';
 
-class Homescreen extends StatefulWidget {
-  const Homescreen({super.key});
+class ShopHomescreen extends StatefulWidget {
+  const ShopHomescreen({super.key});
 
   @override
-  State<Homescreen> createState() => _HomescreenState();
+  State<ShopHomescreen> createState() => _ShopHomescreenState();
 }
 
-class _HomescreenState extends State<Homescreen> {
-  final ModeController modeController = Get.put(ModeController());
-
+class _ShopHomescreenState extends State<ShopHomescreen> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey howItWorksKey = GlobalKey();
   final homedata = Get.find<AuthRepository>();
-
+  final modeController = Get.find<ModeController>();
   @override
   void initState() {
     super.initState();

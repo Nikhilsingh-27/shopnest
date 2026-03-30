@@ -19,4 +19,6 @@ abstract class Routes {
   static const verify = '/verify';
 
   static const chekout = '/checkout';
+
+  static const shopping = "/shopping";
 }

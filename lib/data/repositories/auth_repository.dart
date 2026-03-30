@@ -471,4 +471,22 @@ class AuthRepository extends GetxController {
       throw Exception(errorMessage);
     }
   }
+
+  Future<Map<String, dynamic>> getrentalstatusfun() async {
+    try {
+      final response = await dio.get(
+        ApiConstants.rentalstatus,
+        options: Options(extra: {"requiresToken": true}),
+      );
+      if (response.data == null) {
+        throw Exception("Empty response from server");
+      }
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final errorMessage =
+          e.response?.data?["message"] ?? e.message ?? "API error";
+
+      throw Exception(errorMessage);
+    }
+  }
 }

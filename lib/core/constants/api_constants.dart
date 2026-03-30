@@ -33,4 +33,6 @@ class ApiConstants {
   static const addwishlist = "/wishlist/add";
   static const getwishlist = "/wishlist";
   static const deltewishlist = "/wishlist/remove";
+
+  static const rentalstatus = "/rentals/my";
 }
