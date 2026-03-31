@@ -172,6 +172,24 @@ class AuthRepository extends GetxController {
     }
   }
 
+  Future<Map<String, dynamic>> getproductbyidfun({required String id}) async {
+    try {
+      final response = await dio.get(
+        "${ApiConstants.products}/$id",
+        options: Options(extra: {"requiresToken": true}),
+      );
+      if (response.data == null) {
+        throw Exception("Empty response from server");
+      }
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final errorMessage =
+          e.response?.data?["message"] ?? e.message ?? "API error";
+
+      throw Exception(errorMessage);
+    }
+  }
+
   Future<Map<String, dynamic>> categorybyid({
     required dynamic id,
     required int page,

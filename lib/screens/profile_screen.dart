@@ -691,10 +691,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                             ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange,
+                                backgroundColor: Color(0xFFFF7A45),
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 18,
-                                  vertical: 12,
+                                  horizontal: 12,
+                                  vertical: 10,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
@@ -709,8 +709,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   fetchAddresses(); // 🔄 refresh list
                                 }
                               },
-                              icon: const Icon(Icons.add),
-                              label: const Text("Add New Address"),
+                              icon: const Icon(Icons.add, color: Colors.white),
+                              label: const Text(
+                                "Add New Address",
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ),
                           ],
                         ),
@@ -1195,11 +1198,26 @@ Widget _addressCard(dynamic data, Function onRefresh) {
                 final res = await Get.to(() => EditAddressScreen(data: data));
 
                 if (res == true) {
-                  onRefresh(); // 🔄 refresh list
+                  onRefresh();
                 }
               },
-              icon: const Icon(Icons.edit),
-              label: const Text("Edit"),
+              icon: const Icon(Icons.edit, size: 16), // 🔽 smaller icon
+              label: const Text(
+                "Edit",
+                style: TextStyle(fontSize: 12), // 🔽 smaller text
+              ),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ), // 🔽 tight padding
+                minimumSize: const Size(0, 30), // 🔽 smaller height
+                tapTargetSize:
+                    MaterialTapTargetSize.shrinkWrap, // 🔥 removes extra space
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
             const SizedBox(width: 10),
             OutlinedButton.icon(
@@ -1214,9 +1232,6 @@ Widget _addressCard(dynamic data, Function onRefresh) {
                           CustomSnackbar.showSuccess(
                             res["message"] ?? "Default address updated",
                           );
-
-                          /// 🔄 Refresh address list
-
                           onRefresh();
                         } else {
                           CustomSnackbar.showError(
@@ -1228,8 +1243,29 @@ Widget _addressCard(dynamic data, Function onRefresh) {
                         CustomSnackbar.showError(e.toString());
                       }
                     },
-              icon: const Icon(Icons.star),
-              label: const Text("Set Default"),
+              icon: Icon(
+                Icons.star,
+                size: 16, // 🔽 smaller icon
+                color: data['is_default'] == 1 ? Colors.grey : Colors.orange,
+              ),
+              label: Text(
+                "Set Default",
+                style: TextStyle(
+                  fontSize: 12, // 🔽 smaller text
+                  color: data['is_default'] == 1 ? Colors.grey : Colors.orange,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                minimumSize: const Size(0, 30), // 🔽 compact height
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                side: BorderSide(
+                  color: data['is_default'] == 1 ? Colors.grey : Colors.orange,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
             const SizedBox(width: 10),
             OutlinedButton.icon(
@@ -1242,7 +1278,7 @@ Widget _addressCard(dynamic data, Function onRefresh) {
                   confirmTextColor: Colors.white,
                   buttonColor: Colors.red,
                   onConfirm: () async {
-                    Get.back(); // close dialog
+                    Get.back();
 
                     try {
                       final res = await Get.find<AuthRepository>()
@@ -1252,8 +1288,7 @@ Widget _addressCard(dynamic data, Function onRefresh) {
                         CustomSnackbar.showSuccess(
                           res["message"] ?? "Address deleted successfully",
                         );
-
-                        onRefresh(); // 🔄 refresh list
+                        onRefresh();
                       } else {
                         CustomSnackbar.showError(
                           res["message"] ?? "Failed to delete address",
@@ -1265,8 +1300,31 @@ Widget _addressCard(dynamic data, Function onRefresh) {
                   },
                 );
               },
-              icon: const Icon(Icons.delete, color: Colors.red),
-              label: const Text("Delete", style: TextStyle(color: Colors.red)),
+              icon: const Icon(
+                Icons.delete,
+                color: Colors.red,
+                size: 15,
+              ), // 🔽 smaller icon
+              label: const Text(
+                "Delete",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 11,
+                ), // 🔽 smaller text
+              ),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ), // 🔽 less padding
+                minimumSize: const Size(0, 30), // 🔽 reduce height
+                tapTargetSize:
+                    MaterialTapTargetSize.shrinkWrap, // 🔥 removes extra space
+                side: const BorderSide(color: Colors.red, width: 1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ],
         ),

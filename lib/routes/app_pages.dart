@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:shopnest/screens/Shopping_screen.dart';
+import 'package:shopnest/screens/Shoping/Shop_Home_screen.dart';
 import 'package:shopnest/screens/about_us_screen.dart';
 import 'package:shopnest/screens/categories_screen.dart';
 import 'package:shopnest/screens/checkout_screen.dart';

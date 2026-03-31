@@ -61,21 +61,23 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
           /// IMAGE (INCREASED HEIGHT)
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            child: SizedBox(
-              height: 220, // ✅ Increased height
-              width: double.infinity,
-              child: Image.network(
-                image,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  color: Colors.grey[300],
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.image_not_supported),
-                ),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  /// 🔥 Background (blurred fill)
+                  Image.network(image, fit: BoxFit.cover),
+
+                  /// 🔥 Dark overlay (optional)
+                  Container(color: Colors.black.withOpacity(0.3)),
+
+                  /// ✅ Actual image (full visible)
+                  Image.network(image, fit: BoxFit.contain),
+                ],
               ),
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
@@ -131,7 +133,10 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
                           Get.to(() => SingleproductScreen(item: item));
                         },
                         icon: const Icon(Icons.remove_red_eye),
-                        label: const Text("Details"),
+                        label: const Text(
+                          "Details",
+                          style: TextStyle(fontSize: 12),
+                        ),
                       ),
                     ),
 

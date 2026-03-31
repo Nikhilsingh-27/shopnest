@@ -14,6 +14,19 @@ class SingleproductScreen extends StatefulWidget {
 }
 
 class _SingleproductScreenState extends State<SingleproductScreen> {
+  late PageController _pageController;
+  int currentIndex = 0;
+
+  List<String> _getImages(dynamic images) {
+    if (images == null) return [];
+
+    if (images is List) {
+      return images.map((e) => e.toString()).toList();
+    }
+
+    return [images.toString()];
+  }
+
   int quantity = 1;
 
   String? _asString(dynamic value) => value == null ? null : value.toString();
@@ -79,9 +92,20 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    // Start from a large number to allow both side scrolling
+    _pageController = PageController(initialPage: 1000);
+    currentIndex = 1000;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final item = widget.item;
     final imageUrl = _getImageUrl(_asString(item["images"] ?? item["image"]));
+    final images = _getImages(item["images"] ?? item["image"]);
+    print(item["images"]);
     final name = _nonNull(item["name"] ?? item["title"], "Unknown product");
     final size = _nonNull(item["size"]);
     final color = _nonNull(item["color"]);
@@ -114,21 +138,112 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// PRODUCT IMAGE
-            Container(
-              height: 350,
-              width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              child: AspectRatio(
-                aspectRatio: 4 / 3,
-                child: Image.network(
-                  imageUrl,
-                  width: double.infinity,
-                  fit: BoxFit.fill,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: Colors.grey[300],
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.image_not_supported),
-                  ),
+            AspectRatio(
+              aspectRatio: 1, // 🔥 makes it perfect square
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                child: Stack(
+                  children: [
+                    /// 🔥 SLIDER
+                    PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() => currentIndex = index);
+                      },
+                      itemBuilder: (context, index) {
+                        final realIndex = index % images.length;
+                        final imageUrl = _getImageUrl(images[realIndex]);
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              color: Colors.grey.shade100, // 👈 background
+                              child: Center(
+                                child: Image.network(
+                                  imageUrl,
+                                  fit: BoxFit.contain, // ✅ no stretch
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    color: Colors.grey[300],
+                                    alignment: Alignment.center,
+                                    child: const Icon(
+                                      Icons.image_not_supported,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+
+                    /// ⬅️ LEFT ARROW
+                    Positioned(
+                      left: 5,
+                      top: 0,
+                      bottom: 0,
+                      child: Center(
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back_ios, size: 20),
+                          color: Colors.black,
+                          onPressed: () {
+                            _pageController.previousPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+
+                    /// ➡️ RIGHT ARROW
+                    Positioned(
+                      right: 5,
+                      top: 0,
+                      bottom: 0,
+                      child: Center(
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_forward_ios, size: 20),
+                          color: Colors.black,
+                          onPressed: () {
+                            _pageController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+
+                    /// 🔵 DOT INDICATOR (FIXED)
+                    Positioned(
+                      bottom: 10,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(images.length, (index) {
+                          final realIndex =
+                              currentIndex % images.length; // ✅ fix
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: realIndex == index ? 10 : 6,
+                            height: realIndex == index ? 10 : 6,
+                            decoration: BoxDecoration(
+                              color: realIndex == index
+                                  ? Colors.orange
+                                  : Colors.grey,
+                              shape: BoxShape.circle,
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

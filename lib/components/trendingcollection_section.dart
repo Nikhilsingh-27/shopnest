@@ -165,7 +165,7 @@ class _TrendingcollectionSectionState extends State<TrendingcollectionSection> {
     _startAutoScroll(items.length);
 
     return SizedBox(
-      height: 450,
+      height: 600,
       child: PageView.builder(
         controller: _pageController,
         itemCount: items.length,

@@ -154,14 +154,14 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
 
                       Text(
                         user?["name"] ?? "",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(color: Colors.white, fontSize: 15),
                       ),
 
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 5),
 
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
+                          horizontal: 8,
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
@@ -172,7 +172,7 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
                           check ? "Verified" : "Unverified",
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 11,
+                            fontSize: 10,
                           ),
                         ),
                       ),

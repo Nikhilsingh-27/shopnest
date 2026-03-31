@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
+// ✅ NEW IMPORTS
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shopnest/components/custom_snackbar.dart';
 import 'package:shopnest/components/main_layout_drawer.dart';
 import 'package:shopnest/data/repositories/auth_repository.dart';
@@ -12,6 +17,12 @@ class AddAddressScreen extends StatefulWidget {
 }
 
 class _AddAddressScreenState extends State<AddAddressScreen> {
+  bool fullNameError = false;
+  bool phoneError = false;
+  bool addressError = false;
+  bool cityError = false;
+  bool stateError = false;
+  bool pincodeError = false;
   final repo = Get.find<AuthRepository>();
 
   final fullNameController = TextEditingController();
@@ -24,17 +35,116 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
   String addressType = "home";
   bool isDefault = false;
-
   bool isLoading = false;
 
+  /// 🚀 GET CURRENT LOCATION
+  Future<void> getCurrentLocation() async {
+    try {
+      setState(() => isLoading = true);
+
+      // 🔐 Request Permission
+      var status = await Permission.location.request();
+
+      if (status.isDenied) {
+        CustomSnackbar.showError("Location permission denied");
+        return;
+      }
+
+      if (status.isPermanentlyDenied) {
+        openAppSettings();
+        return;
+      }
+
+      // 📡 Check GPS
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        CustomSnackbar.showError("Please enable location services");
+        return;
+      }
+
+      // 📍 Get Position
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // 🌍 Convert to Address
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      print(placemarks);
+      Placemark place = placemarks[0];
+
+      // ✨ Autofill Fields
+      addressController.text =
+          "${place.street}, ${place.subLocality}, ${place.locality}";
+      cityController.text = place.locality ?? "";
+      stateController.text = place.administrativeArea ?? "";
+      pincodeController.text = place.postalCode ?? "";
+
+      CustomSnackbar.showSuccess("Location fetched successfully");
+    } catch (e) {
+      CustomSnackbar.showError("Failed to get location");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
   Future<void> submit() async {
-    if (fullNameController.text.isEmpty ||
-        phoneController.text.isEmpty ||
-        addressController.text.isEmpty ||
-        cityController.text.isEmpty ||
-        stateController.text.isEmpty ||
-        pincodeController.text.isEmpty) {
-      CustomSnackbar.showError("Please fill all required fields");
+    setState(() {
+      fullNameError = false;
+      phoneError = false;
+      addressError = false;
+      cityError = false;
+      stateError = false;
+      pincodeError = false;
+    });
+
+    final phone = phoneController.text.trim();
+
+    // ✅ REGEX
+    final phoneRegex = RegExp(r'^[0-9]{10}$');
+
+    if (fullNameController.text.isEmpty) {
+      setState(() => fullNameError = true);
+      CustomSnackbar.showError("Full Name required");
+      return;
+    }
+
+    if (phone.isEmpty) {
+      setState(() => phoneError = true);
+      CustomSnackbar.showError("Phone required");
+      return;
+    }
+
+    // 🔥 NEW VALIDATION
+    if (!phoneRegex.hasMatch(phone)) {
+      setState(() => phoneError = true);
+      CustomSnackbar.showError("Phone must be exactly 10 digits");
+      return;
+    }
+
+    if (addressController.text.isEmpty) {
+      setState(() => addressError = true);
+      CustomSnackbar.showError("Address required");
+      return;
+    }
+
+    if (cityController.text.isEmpty) {
+      setState(() => cityError = true);
+      CustomSnackbar.showError("City required");
+      return;
+    }
+
+    if (stateController.text.isEmpty) {
+      setState(() => stateError = true);
+      CustomSnackbar.showError("State required");
+      return;
+    }
+
+    if (pincodeController.text.isEmpty) {
+      setState(() => pincodeError = true);
+      CustomSnackbar.showError("Pincode required");
       return;
     }
 
@@ -44,7 +154,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       final res = await repo.addaddressfun(
         addressType: addressType,
         fullName: fullNameController.text.trim(),
-        phone: phoneController.text.trim(),
+        phone: phone,
         address: addressController.text.trim(),
         landmark: landmarkController.text.trim(),
         city: cityController.text.trim(),
@@ -54,12 +164,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       );
 
       if (res["success"] == true) {
-        CustomSnackbar.showSuccess(
-          res["message"] ?? "Address added successfully",
-        );
+        CustomSnackbar.showSuccess("Address added");
         Navigator.pop(context, true);
       } else {
-        CustomSnackbar.showError(res["message"] ?? "Failed to add address");
+        CustomSnackbar.showError(res["message"] ?? "Failed");
       }
     } catch (e) {
       CustomSnackbar.showError(e.toString());
@@ -68,22 +176,41 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     }
   }
 
-  /// 🔹 Input Field with Placeholder
+  /// 🔹 Input Field
   Widget input(
     String label,
     String hint,
     TextEditingController controller,
     IconData icon, {
     int maxLines = 1,
+    bool showLocationButton = false,
+    bool error = false,
+    TextInputType keyboardType = TextInputType.text,
+    List<TextInputFormatter>? inputFormatters,
+    Function(String)? onChanged,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
+      padding: const EdgeInsets.only(bottom: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          Row(
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              if (showLocationButton)
+                ElevatedButton.icon(
+                  onPressed: isLoading ? null : getCurrentLocation,
+                  icon: const Icon(Icons.my_location, size: 14),
+                  label: const Text("Use Current"),
+                ),
+            ],
           ),
           const SizedBox(height: 6),
 
@@ -92,18 +219,38 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             decoration: BoxDecoration(
               color: Colors.grey.shade100,
               borderRadius: BorderRadius.circular(12),
+
+              /// 🔴 ERROR BORDER
+              border: Border.all(
+                color: error ? Colors.red : Colors.grey.shade300,
+                width: error ? 1.5 : 1,
+              ),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(icon, size: 20),
+                Icon(
+                  icon,
+                  size: 20,
+                  color: error ? Colors.red : Colors.grey.shade700,
+                ),
                 const SizedBox(width: 10),
 
                 Expanded(
                   child: TextField(
                     controller: controller,
                     maxLines: maxLines,
+                    keyboardType: keyboardType,
+                    inputFormatters: inputFormatters,
                     textAlignVertical: TextAlignVertical.top,
+
+                    /// 🔥 AUTO REMOVE ERROR
+                    onChanged: (value) {
+                      if (error && onChanged != null) {
+                        onChanged(value);
+                      }
+                    },
+
                     decoration: InputDecoration(
                       hintText: hint,
                       hintStyle: TextStyle(color: Colors.grey.shade500),
@@ -115,12 +262,21 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               ],
             ),
           ),
+
+          /// 👇 ERROR TEXT BELOW FIELD
+          if (error)
+            Padding(
+              padding: const EdgeInsets.only(top: 6, left: 6),
+              child: Text(
+                "This field is required",
+                style: const TextStyle(color: Colors.red, fontSize: 12),
+              ),
+            ),
         ],
       ),
     );
   }
 
-  /// 🔹 Address Type Chip
   Widget addressTypeChip(String type, IconData icon) {
     final isSelected = addressType == type;
 
@@ -158,28 +314,13 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 🔙 Back Button
-            IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back),
-            ),
-
-            /// 🧾 Heading
             const Text(
               "Add Address",
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 5),
 
-            const Text(
-              "Enter your delivery details",
-              style: TextStyle(color: Colors.grey),
-            ),
-
-            const SizedBox(height: 20),
-
-            /// 📦 FORM CARD
+            /// 📍 LOCATION BUTTON
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -195,7 +336,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               ),
               child: Column(
                 children: [
-                  /// Address Type Chips
                   Row(
                     children: [
                       addressTypeChip("home", Icons.home),
@@ -205,64 +345,85 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                       addressTypeChip("other", Icons.location_on),
                     ],
                   ),
-
                   const SizedBox(height: 20),
 
                   input(
                     "Full Name",
-                    "Enter your full name",
+                    "Enter full name",
                     fullNameController,
                     Icons.person,
+                    error: fullNameError,
+                    onChanged: (_) {
+                      if (fullNameError) {
+                        setState(() => fullNameError = false);
+                      }
+                    },
                   ),
+
                   input(
                     "Phone",
-                    "Enter your phone number",
+                    "Enter phone",
                     phoneController,
                     Icons.phone,
+                    error: phoneError,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(10),
+                    ],
+                    onChanged: (_) {
+                      if (phoneError) {
+                        setState(() => phoneError = false);
+                      }
+                    },
                   ),
+
                   input(
                     "Address",
-                    "House no, street, area",
+                    "House, street",
                     addressController,
                     Icons.home,
                     maxLines: 3,
+                    showLocationButton: true,
+                    error: addressError,
                   ),
+
                   input(
                     "Landmark",
-                    "Nearby landmark (optional)",
+                    "Nearby landmark",
                     landmarkController,
                     Icons.place,
-                  ),
+                    error: false,
+                  ), // optional field → no validation
+
                   input(
                     "City",
-                    "Enter your city",
+                    "City",
                     cityController,
                     Icons.location_city,
+                    error: cityError,
                   ),
+
                   input(
                     "State",
-                    "Enter your state",
+                    "State",
                     stateController,
                     Icons.map,
+                    error: stateError,
                   ),
+
                   input(
                     "Pincode",
-                    "Enter 6-digit pincode",
+                    "Pincode",
                     pincodeController,
                     Icons.pin_drop,
+                    error: pincodeError,
                   ),
-
-                  const SizedBox(height: 10),
-
-                  /// Default Checkbox
                   Row(
                     children: [
                       Checkbox(
                         value: isDefault,
-                        activeColor: Colors.orange,
-                        onChanged: (val) {
-                          setState(() => isDefault = val!);
-                        },
+                        onChanged: (val) => setState(() => isDefault = val!),
                       ),
                       const Text("Set as default address"),
                     ],
@@ -273,7 +434,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
             const SizedBox(height: 25),
 
-            /// 🚀 Submit Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -281,16 +441,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
                 ),
                 child: isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text(
-                        "Save Address",
-                        style: TextStyle(fontSize: 16),
-                      ),
+                    : const Text("Save Address"),
               ),
             ),
           ],
