@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shopnest/components/custom_snackbar.dart';
 import 'package:shopnest/data/repositories/auth_repository.dart';
@@ -13,80 +15,30 @@ class WishlistCard extends StatefulWidget {
 }
 
 class _WishlistCardState extends State<WishlistCard> {
-  bool isAddingToCart = false; // ✅ loading state
-
+  bool isAddingToCart = false;
   int quantity = 1;
 
-  Future<void> addToCart(int quantityToAdd) async {
-    if (isAddingToCart) return; // ✅ prevent multiple clicks
+  /// ✅ Extract first image safely
+  String? _getFirstImage(dynamic imagesData) {
+    if (imagesData is List && imagesData.isNotEmpty) {
+      return imagesData[0].toString();
+    } else if (imagesData is String) {
+      try {
+        final decoded = jsonDecode(imagesData);
 
-    setState(() {
-      isAddingToCart = true;
-    });
-
-    final productId = widget.item["product_id"];
-
-    if (productId == null || productId == 0) {
-      CustomSnackbar.showError("Product ID missing, cannot add to cart.");
-      setState(() => isAddingToCart = false);
-      return;
-    }
-
-    try {
-      final response = await AuthRepository().addcartfun(
-        id: productId.toString(),
-        quantity: quantityToAdd.toString(),
-      );
-
-      if (response["success"] == true) {
-        CustomSnackbar.showSuccess("Product added to cart successfully");
-      } else {
-        CustomSnackbar.showError(
-          response["message"] ?? "Failed to add item to cart",
-        );
+        if (decoded is List && decoded.isNotEmpty) {
+          return decoded[0].toString();
+        } else {
+          return imagesData;
+        }
+      } catch (e) {
+        return imagesData;
       }
-    } catch (e) {
-      CustomSnackbar.showError("Error adding to cart: $e");
     }
-
-    // ✅ wait for snackbar duration (~3 sec)
-    await Future.delayed(const Duration(seconds: 3));
-
-    if (mounted) {
-      setState(() {
-        isAddingToCart = false;
-      });
-    }
+    return null;
   }
 
-  Future<void> deletewishlist() async {
-    final productId = widget.item["product_id"];
-
-    if (productId == null || productId == 0) {
-      CustomSnackbar.showError("Product ID missing, cannot Delete.");
-      return;
-    }
-
-    try {
-      final response = await AuthRepository().deletewishlist(
-        id: productId.toString(),
-      );
-
-      if (response["success"] == true) {
-        CustomSnackbar.showSuccess("Product removed successfully");
-        widget.onDelete();
-      } else {
-        CustomSnackbar.showError(
-          response["message"] ?? "Failed to remove item",
-        );
-      }
-    } catch (e) {
-      CustomSnackbar.showError("Error in removing: $e");
-    }
-  }
-
-  String? _asString(dynamic value) => value == null ? null : value.toString();
-
+  /// ✅ Image URL builder
   String _getImageUrl(String? imageName) {
     const String baseUrl = "https://www.dizaartdemo.com/";
     const String defaultImage = "${baseUrl}public/front/assets/img/list-8.jpg";
@@ -99,11 +51,73 @@ class _WishlistCardState extends State<WishlistCard> {
     return "${baseUrl}demo/shopnest/assets/images/products/$imageFile";
   }
 
+  /// ✅ Add to cart with spam protection
+  Future<void> addToCart(int quantityToAdd) async {
+    if (isAddingToCart) return;
+
+    setState(() => isAddingToCart = true);
+
+    final productId = widget.item["product_id"];
+
+    if (productId == null || productId == 0) {
+      CustomSnackbar.showError("Product ID missing");
+      setState(() => isAddingToCart = false);
+      return;
+    }
+
+    try {
+      final response = await AuthRepository().addcartfun(
+        id: productId.toString(),
+        quantity: quantityToAdd.toString(),
+      );
+
+      if (response["success"] == true) {
+        CustomSnackbar.showSuccess("Added to cart");
+        await Future.delayed(const Duration(seconds: 3));
+      } else {
+        CustomSnackbar.showError(response["message"] ?? "Failed");
+      }
+    } catch (e) {
+      CustomSnackbar.showError("Error: $e");
+    } finally {
+      if (mounted) {
+        setState(() => isAddingToCart = false);
+      }
+    }
+  }
+
+  /// ✅ Delete wishlist item
+  Future<void> deletewishlist() async {
+    final productId = widget.item["product_id"];
+
+    if (productId == null || productId == 0) {
+      CustomSnackbar.showError("Product ID missing");
+      return;
+    }
+
+    try {
+      final response = await AuthRepository().deletewishlist(
+        id: productId.toString(),
+      );
+
+      if (response["success"] == true) {
+        CustomSnackbar.showSuccess("Removed from wishlist");
+        widget.onDelete();
+      } else {
+        CustomSnackbar.showError(response["message"] ?? "Failed");
+      }
+    } catch (e) {
+      CustomSnackbar.showError("Error: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final imageUrl = _getImageUrl(
-      _asString(widget.item["images"] ?? widget.item["image"]),
+    final firstImage = _getFirstImage(
+      widget.item["images"] ?? widget.item["image"],
     );
+
+    final imageUrl = _getImageUrl(firstImage);
 
     return Container(
       width: double.infinity,
@@ -125,17 +139,15 @@ class _WishlistCardState extends State<WishlistCard> {
           /// IMAGE
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            child: SizedBox(
-              height: 220,
-              width: double.infinity,
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  color: Colors.grey[300],
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.image_not_supported),
-                ),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.network(imageUrl, fit: BoxFit.cover),
+                  Container(color: Colors.black.withOpacity(0.3)),
+                  Image.network(imageUrl, fit: BoxFit.contain),
+                ],
               ),
             ),
           ),
@@ -147,7 +159,7 @@ class _WishlistCardState extends State<WishlistCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.item["name"],
+                  widget.item["name"] ?? "",
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -195,9 +207,15 @@ class _WishlistCardState extends State<WishlistCard> {
                             : const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.add_shopping_cart),
+                                  Icon(
+                                    Icons.add_shopping_cart,
+                                    color: Colors.white,
+                                  ),
                                   SizedBox(width: 6),
-                                  Text("Add to Cart"),
+                                  Text(
+                                    "Add to Cart",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ],
                               ),
                       ),

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shopnest/components/custom_snackbar.dart';
 import 'package:shopnest/data/repositories/auth_repository.dart';
@@ -13,20 +15,58 @@ class CartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String getLogoImageUrl(String? logoPath) {
+    String getLogoImageUrl(String? imageName) {
       const String baseUrl = "https://www.dizaartdemo.com/";
       const String defaultImage =
           "${baseUrl}public/front/assets/img/list-8.jpg";
 
-      if (logoPath == null || logoPath.trim().isEmpty) {
-        return defaultImage;
-      }
+      if (imageName == null || imageName.trim().isEmpty) return defaultImage;
 
-      final imageName = logoPath.split('/').last;
-      if (imageName.isEmpty) return defaultImage;
+      final imageFile = imageName.split('/').last;
+      if (imageFile.isEmpty) return defaultImage;
 
-      return "${baseUrl}demo/shopnest/assets/images/products/$imageName";
+      return "${baseUrl}demo/shopnest/assets/images/products/$imageFile";
     }
+
+    dynamic imagesData = item["images"];
+
+    String? firstImage;
+
+    if (imagesData is List && imagesData.isNotEmpty) {
+      firstImage = imagesData[0].toString();
+    } else if (imagesData is String) {
+      try {
+        // 🔥 try to decode JSON string
+        final decoded = jsonDecode(imagesData);
+
+        if (decoded is List && decoded.isNotEmpty) {
+          firstImage = decoded[0].toString();
+        } else {
+          firstImage = imagesData; // fallback
+        }
+      } catch (e) {
+        // 🔥 if not JSON, treat as normal string
+        firstImage = imagesData;
+      }
+    } else {
+      firstImage = null;
+    }
+
+    final imageUrl = getLogoImageUrl(firstImage);
+    // String getLogoImageUrl(String? logoPath) {
+    //   const String baseUrl = "https://www.dizaartdemo.com/";
+    //   const String defaultImage =
+    //       "${baseUrl}public/front/assets/img/list-8.jpg";
+    //
+    //   if (logoPath == null || logoPath.trim().isEmpty) {
+    //     return defaultImage;
+    //   }
+    //
+    //   final imageName = logoPath.split('/').last;
+    //   if (imageName.isEmpty) return defaultImage;
+    //
+    //   return "${baseUrl}demo/shopnest/assets/images/products/$imageName";
+    // }
 
     final AuthRepository repo = AuthRepository();
     return Container(
@@ -49,12 +89,22 @@ class CartCard extends StatelessWidget {
         children: [
           /// IMAGE
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
-            child: Image.network(
-              getLogoImageUrl(item["images"]),
-              height: 250,
-              width: double.infinity,
-              fit: BoxFit.cover,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  /// 🔥 Background (blurred fill)
+                  Image.network(imageUrl, fit: BoxFit.cover),
+
+                  /// 🔥 Dark overlay (optional)
+                  Container(color: Colors.black.withOpacity(0.3)),
+
+                  /// ✅ Actual image (full visible)
+                  Image.network(imageUrl, fit: BoxFit.contain),
+                ],
+              ),
             ),
           ),
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shopnest/core/storage/token_storage.dart';
 import 'package:shopnest/modules/controllers/cart_controller.dart';
 import 'package:shopnest/screens/singleproduct_screen.dart';
 
@@ -21,6 +22,8 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
 
     return "${baseUrl}demo/shopnest/assets/images/products/$imageFile";
   }
+
+  final TokenStorage tokenStorage = TokenStorage();
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +155,20 @@ class TrendingcollectionCardForScreen extends StatelessWidget {
                         return ElevatedButton.icon(
                           onPressed: isLoading
                               ? null
-                              : () => cartController.addToCart(id),
+                              : () {
+                                  bool isLoggedIn =
+                                      tokenStorage.getToken() != null &&
+                                      tokenStorage.isTokenValid();
+
+                                  if (!isLoggedIn) {
+                                    Get.toNamed("/login");
+
+                                    return;
+                                  }
+
+                                  /// ✅ LOGGED IN → ADD TO CART
+                                  cartController.addToCart(id);
+                                },
 
                           icon: const Icon(Icons.add_shopping_cart),
 

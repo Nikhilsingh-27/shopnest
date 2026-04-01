@@ -25,13 +25,13 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   int delivery = 99;
-  double applyGST(int amount) {
+  double applyGST(double amount) {
     double gst = amount * 0.18;
     return double.parse(gst.toStringAsFixed(4));
   }
 
   double finalprice = 0;
-  int totalamt = 0;
+  double totalamt = 0;
   double gst = 0;
   Future<void> fetchCart() async {
     try {
@@ -39,13 +39,14 @@ class _CartScreenState extends State<CartScreen> {
       final id = user?["id"].toString();
 
       final response = await home.getusercarts(id: id ?? "");
-
+      print(response);
       if (response["success"] == true) {
         setState(() {
           productlist = List<Map<String, dynamic>>.from(
             response["data"]["items"],
           );
           totalamt = response["data"]["subtotal"];
+          print(totalamt);
           gst = applyGST(totalamt);
 
           finalprice = totalamt + gst + delivery;
@@ -154,109 +155,111 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 20),
-
                       /// RENTAL SUMMARY CARD
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(25),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xff6a7bd1), Color(0xff7a4fa3)],
+                      ///
+                      if (productlist.isNotEmpty) ...[
+                        const SizedBox(height: 20),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(25),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xff6a7bd1), Color(0xff7a4fa3)],
+                            ),
                           ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            /// TITLE
-                            const Row(
-                              children: [
-                                Icon(
-                                  Icons.receipt_long,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  "Rental Summary",
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              /// TITLE
+                              const Row(
+                                children: [
+                                  Icon(
+                                    Icons.receipt_long,
                                     color: Colors.white,
+                                    size: 28,
                                   ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 30),
-
-                            /// PRICE ROWS
-                            _priceRow("Rental Subtotal:", "₹${totalamt}"),
-                            const SizedBox(height: 12),
-
-                            _priceRow("Delivery Charge:", "₹99.00"),
-                            const SizedBox(height: 12),
-
-                            _priceRow("Tax (18% GST):", "₹${gst}"),
-
-                            const SizedBox(height: 20),
-
-                            const Divider(color: Colors.white54),
-
-                            const SizedBox(height: 15),
-
-                            /// TOTAL
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Total Payable:",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "Rental Summary",
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  "₹$finalprice",
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                ],
+                              ),
+
+                              const SizedBox(height: 30),
+
+                              /// PRICE ROWS
+                              _priceRow("Rental Subtotal:", "₹${totalamt}"),
+                              const SizedBox(height: 12),
+
+                              _priceRow("Delivery Charge:", "₹99.00"),
+                              const SizedBox(height: 12),
+
+                              _priceRow("Tax (18% GST):", "₹${gst}"),
+
+                              const SizedBox(height: 20),
+
+                              const Divider(color: Colors.white54),
+
+                              const SizedBox(height: 15),
+
+                              /// TOTAL
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Total Payable:",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
+                                  Text(
+                                    "₹$finalprice",
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
 
-                            const SizedBox(height: 30),
+                              const SizedBox(height: 30),
 
-                            /// CHECKOUT BUTTON
-                            SizedBox(
-                              width: double.infinity,
-                              height: 50,
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  Get.toNamed("/checkout");
-                                },
-                                icon: const Icon(Icons.credit_card),
-                                label: const Text(
-                                  "Proceed to Checkout",
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.black,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                              /// CHECKOUT BUTTON
+                              SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton.icon(
+                                  onPressed: () {
+                                    Get.toNamed("/checkout");
+                                  },
+                                  icon: const Icon(Icons.credit_card),
+                                  label: const Text(
+                                    "Proceed to Checkout",
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-
+                      ],
                       const SizedBox(height: 25),
 
                       /// RENTAL POLICIES CARD

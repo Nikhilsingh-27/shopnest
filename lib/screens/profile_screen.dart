@@ -88,6 +88,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final res = await repo.getwishlistfun();
       wishlistlist = res['data'] ?? [];
+      print(wishlistlist);
     } catch (e) {
       print(e);
     } finally {

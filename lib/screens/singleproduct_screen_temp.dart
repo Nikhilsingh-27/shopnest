@@ -155,11 +155,7 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
     super.dispose();
   }
 
-  void _openFullScreenGallery(
-    BuildContext context,
-    List<String> images,
-    int initialIndex,
-  ) {
+  void _openFullScreenGallery(BuildContext context, List<String> images, int initialIndex) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => FullScreenGallery(
@@ -174,8 +170,6 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
   @override
   Widget build(BuildContext context) {
     final item = widget.item;
-    print(item);
-    final desc = item["description"] ?? "";
     final imageUrl = _getImageUrl(_asString(item["images"] ?? item["image"]));
     final images = _getImages(item["images"] ?? item["image"]);
     print(item["images"]);
@@ -222,8 +216,7 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
                   children: [
                     /// 🔥 SLIDER
                     PageView.builder(
-                      physics:
-                          (isZoomedState || isInteracting || _pointerCount >= 2)
+                      physics: (isZoomedState || isInteracting || _pointerCount >= 2)
                           ? const NeverScrollableScrollPhysics()
                           : const BouncingScrollPhysics(),
                       controller: _pageController,
@@ -261,49 +254,42 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
                                           _transformationController.value =
                                               Matrix4.identity();
                                         } else {
-                                          _openFullScreenGallery(
-                                            context,
-                                            images,
-                                            realIndex,
-                                          );
+                                          _openFullScreenGallery(context, images, realIndex);
                                         }
                                       },
                                       child: Listener(
                                         onPointerDown: (_) {
-                                          if (++_pointerCount == 2)
-                                            setState(() {});
+                                          if (++_pointerCount == 2) setState(() {});
                                         },
                                         onPointerUp: (_) {
-                                          if (--_pointerCount == 1)
-                                            setState(() {});
+                                          if (--_pointerCount == 1) setState(() {});
                                         },
                                         onPointerCancel: (_) {
-                                          if (--_pointerCount == 1)
-                                            setState(() {});
+                                          if (--_pointerCount == 1) setState(() {});
                                         },
                                         child: InteractiveViewer(
                                           transformationController:
                                               _transformationController,
-                                          onInteractionStart: (_) {
-                                            setState(() {
-                                              isInteracting = true;
-                                            });
-                                          },
-                                          onInteractionEnd: (_) {
-                                            setState(() {
-                                              isInteracting = false;
-                                            });
-                                          },
-                                          panEnabled: isZoomedState,
-                                          scaleEnabled: true,
-                                          minScale: 1,
-                                          maxScale: 4,
-                                          clipBehavior: Clip.hardEdge,
-                                          child: Image.network(
-                                            imageUrl,
-                                            fit: BoxFit.contain,
-                                          ),
+                                        onInteractionStart: (_) {
+                                          setState(() {
+                                            isInteracting = true;
+                                          });
+                                        },
+                                        onInteractionEnd: (_) {
+                                          setState(() {
+                                            isInteracting = false;
+                                          });
+                                        },
+                                        panEnabled: isZoomedState,
+                                        scaleEnabled: true,
+                                        minScale: 1,
+                                        maxScale: 4,
+                                        clipBehavior: Clip.hardEdge,
+                                        child: Image.network(
+                                          imageUrl,
+                                          fit: BoxFit.contain,
                                         ),
+                                      ),
                                       ),
                                     ),
                                   ),
@@ -475,7 +461,7 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    desc,
+                    "Beautiful traditional red silk saree with zari work",
                     style: const TextStyle(fontSize: 18, color: Colors.black),
                   ),
                   SizedBox(height: 10),
@@ -803,20 +789,14 @@ class _FullScreenGalleryState extends State<FullScreenGallery> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
           "${currentIndex + 1} / ${widget.images.length}",
-          style: const TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-          ),
+          style: const TextStyle(color: Colors.white),
         ),
-        centerTitle: true,
       ),
       body: PageView.builder(
         physics: _isZoomed
@@ -929,7 +909,10 @@ class _ZoomableImageState extends State<ZoomableImage> {
           panEnabled: _isZoomed,
           clipBehavior: Clip.hardEdge,
           child: Center(
-            child: Image.network(widget.imageUrl, fit: BoxFit.contain),
+            child: Image.network(
+              widget.imageUrl,
+              fit: BoxFit.contain,
+            ),
           ),
         ),
       ),
