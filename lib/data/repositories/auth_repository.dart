@@ -507,4 +507,46 @@ class AuthRepository extends GetxController {
       throw Exception(errorMessage);
     }
   }
+
+  Future<Map<String, dynamic>> forgotpassgentoken({
+    required String email,
+  }) async {
+    try {
+      final response = await dio.post(
+        ApiConstants.forgotpass,
+        data: {"email": email},
+        options: Options(extra: {"requiresToken": false}),
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final errorMessage =
+          e.response?.data?["message"] ?? e.message ?? "API error";
+
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<Map<String, dynamic>> resetpassword({
+    required String token,
+    required String newpassword,
+    required String confirmpass,
+  }) async {
+    try {
+      final response = await dio.post(
+        ApiConstants.resetpass,
+        data: {
+          "token": token,
+          "new_password": newpassword,
+          "confirm_password": confirmpass,
+        },
+        options: Options(extra: {"requiresToken": false}),
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final errorMessage =
+          e.response?.data?["message"] ?? e.message ?? "API error";
+
+      throw Exception(errorMessage);
+    }
+  }
 }

@@ -35,4 +35,7 @@ class ApiConstants {
   static const deltewishlist = "/wishlist/remove";
 
   static const rentalstatus = "/rentals/my";
+
+  static const forgotpass = "/auth/forgot-password";
+  static const resetpass = "/auth/reset-password";
 }

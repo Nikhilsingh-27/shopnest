@@ -4,6 +4,7 @@ import 'package:shopnest/components/main_layout_drawer.dart';
 import 'package:shopnest/components/shopfooter_section.dart';
 import 'package:shopnest/core/storage/token_storage.dart';
 import 'package:shopnest/data/repositories/auth_repository.dart';
+import 'package:video_player/video_player.dart';
 
 class SingleproductScreen extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -23,6 +24,11 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
       TransformationController();
   bool isAddingToCart = false;
   bool isAddingToWishlist = false;
+
+  VideoPlayerController? _videoPlayerController;
+  bool _isVideoInitialized = false;
+  String? _videoErrorMsg;
+  bool _isMuted = true;
   bool isUserLoggedIn() {
     return tokenStorage.getToken() != null && tokenStorage.isTokenValid();
   }
@@ -134,6 +140,33 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
   void initState() {
     super.initState();
 
+    final videoPath = widget.item["video_path"];
+    if (videoPath != null && videoPath.toString().isNotEmpty) {
+      final videoUrl = "https://www.dizaartdemo.com/demo/shopnest/assets/videos/products/$videoPath";
+      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(videoUrl))
+        ..initialize().then((_) {
+          if (mounted) {
+            setState(() {
+              _isVideoInitialized = true;
+            });
+            _videoPlayerController!.setLooping(true);
+            _videoPlayerController!.setVolume(0.0);
+            
+            final imagesCount = _getImages(widget.item["images"] ?? widget.item["image"]).length;
+            final totalSlides = imagesCount + 1;
+            if (currentIndex % totalSlides == imagesCount) {
+              _videoPlayerController!.play();
+            }
+          }
+        }).catchError((e) {
+          if (mounted) {
+            setState(() {
+              _videoErrorMsg = e.toString();
+            });
+          }
+        });
+    }
+
     // Start from a large number to allow both side scrolling
     _pageController = PageController(initialPage: 1000);
     currentIndex = 1000;
@@ -150,6 +183,7 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
 
   @override
   void dispose() {
+    _videoPlayerController?.dispose();
     _transformationController.dispose();
     _pageController.dispose();
     super.dispose();
@@ -178,6 +212,10 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
     final desc = item["description"] ?? "";
     final imageUrl = _getImageUrl(_asString(item["images"] ?? item["image"]));
     final images = _getImages(item["images"] ?? item["image"]);
+
+    final videoPath = item["video_path"];
+    final bool hasVideo = videoPath != null && videoPath.toString().isNotEmpty;
+    final int totalSlides = images.length + (hasVideo ? 1 : 0);
     print(item["images"]);
     final name = _nonNull(item["name"] ?? item["title"], "Unknown product");
     final size = _nonNull(item["size"]);
@@ -230,9 +268,105 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
                       onPageChanged: (index) {
                         setState(() => currentIndex = index);
                         _transformationController.value = Matrix4.identity();
+                        
+                        if (hasVideo && _videoPlayerController != null && _isVideoInitialized) {
+                          final realIndex = index % totalSlides;
+                          if (realIndex == images.length) {
+                            _videoPlayerController!.play();
+                          } else {
+                            _videoPlayerController!.pause();
+                          }
+                        }
                       },
                       itemBuilder: (context, index) {
-                        final realIndex = index % images.length;
+                        final realIndex = index % totalSlides;
+                        
+                        if (hasVideo && realIndex == images.length) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                color: Colors.black,
+                                child: Center(
+                                  child: _videoErrorMsg != null
+                                      ? Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(Icons.error, color: Colors.white, size: 40),
+                                            const SizedBox(height: 10),
+                                            const Text("Failed to load video", style: TextStyle(color: Colors.white)),
+                                            const SizedBox(height: 10),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                                              child: Text(
+                                                _videoErrorMsg!,
+                                                style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : _isVideoInitialized && _videoPlayerController != null
+                                          ? Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                AspectRatio(
+                                                  aspectRatio: _videoPlayerController!.value.aspectRatio,
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        if (_videoPlayerController!.value.isPlaying) {
+                                                          _videoPlayerController!.pause();
+                                                        } else {
+                                                          _videoPlayerController!.play();
+                                                        }
+                                                      });
+                                                    },
+                                                    child: VideoPlayer(_videoPlayerController!),
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  bottom: 10,
+                                                  right: 10,
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        _isMuted = !_isMuted;
+                                                        _videoPlayerController!.setVolume(_isMuted ? 0.0 : 1.0);
+                                                      });
+                                                    },
+                                                    child: Container(
+                                                      padding: const EdgeInsets.all(6),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.black.withOpacity(0.5),
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      child: Icon(
+                                                        _isMuted ? Icons.volume_off : Icons.volume_up,
+                                                        color: Colors.white,
+                                                        size: 20,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                if (!_videoPlayerController!.value.isPlaying)
+                                                  IgnorePointer(
+                                                    child: Icon(
+                                                      Icons.play_circle_fill,
+                                                      color: Colors.white.withOpacity(0.7),
+                                                      size: 60,
+                                                    ),
+                                                  ),
+                                              ],
+                                            )
+                                          : const CircularProgressIndicator(),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
                         final imageUrl = _getImageUrl(images[realIndex]);
 
                         return Padding(
@@ -360,9 +494,9 @@ class _SingleproductScreenState extends State<SingleproductScreen> {
                       right: 0,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(images.length, (index) {
+                        children: List.generate(totalSlides, (index) {
                           final realIndex =
-                              currentIndex % images.length; // ✅ fix
+                              currentIndex % totalSlides; // ✅ fix
                           return Container(
                             margin: const EdgeInsets.symmetric(horizontal: 4),
                             width: realIndex == index ? 10 : 6,
