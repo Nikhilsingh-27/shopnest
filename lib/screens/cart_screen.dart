@@ -1,10 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopnest/components/cart_card.dart';
 import 'package:shopnest/components/main_layout_drawer.dart';
 import 'package:shopnest/components/shopfooter_section.dart';
 import 'package:shopnest/data/repositories/auth_repository.dart';
+import 'package:shopnest/screens/addAddress_screen.dart';
 
+//2667.24
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
@@ -21,18 +24,128 @@ class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
     super.initState();
-    fetchCart();
+    fetchCartAndAddress();
   }
 
   int delivery = 99;
+  String currentAddress = "Loading addresses...";
+  bool isLocationLoading = true;
+
+  List<Map<String, dynamic>> userAddresses = [];
+  Map<String, dynamic>? selectedAddress;
+
+  static const double warehouseLat = 28.6139;
+  static const double warehouseLng = 77.3910;
+  static const String googleMapsApiKey =
+      "AIzaSyA6QGBhKVtToksi-gydARasyxhcpJoiKbw";
+
   double applyGST(double amount) {
     double gst = amount * 0.18;
-    return double.parse(gst.toStringAsFixed(4));
+    return double.parse(gst.toStringAsFixed(2));
   }
 
   double finalprice = 0;
   double totalamt = 0;
   double gst = 0;
+
+  void _calculateTotals() {
+    gst = applyGST(totalamt);
+    finalprice = double.parse((totalamt + gst + delivery).toStringAsFixed(2));
+  }
+
+  Future<void> fetchCartAndAddress() async {
+    await fetchCart();
+    await _getUserAddresses();
+  }
+
+  Future<void> _getUserAddresses() async {
+    try {
+      final res = await home.getaddressfun();
+      final List data = res["data"] ?? [];
+
+      if (data.isNotEmpty) {
+        setState(() {
+          userAddresses = List<Map<String, dynamic>>.from(data);
+          selectedAddress = userAddresses.firstWhere(
+            (addr) => addr['is_default'] == true || addr['is_default'] == 1,
+            orElse: () => userAddresses.first,
+          );
+        });
+
+        await _calculateDeliveryForSelectedAddress();
+      } else {
+        setState(() {
+          userAddresses = [];
+          selectedAddress = null;
+          isLocationLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Address error: $e");
+      setState(() {
+        isLocationLoading = false;
+      });
+    }
+  }
+
+  Future<List<double>?> _getLatLngFromAddress(String addressText) async {
+    try {
+      final url =
+          "https://maps.googleapis.com/maps/api/geocode/json?address=${Uri.encodeComponent(addressText)}&key=$googleMapsApiKey";
+      final response = await Dio().get(url);
+      final data = response.data;
+      if (data['status'] == 'OK' && data['results'].isNotEmpty) {
+        final location = data['results'][0]['geometry']['location'];
+        return [location['lat'], location['lng']];
+      }
+    } catch (e) {
+      print("Geocoding API error: $e");
+    }
+    return null;
+  }
+
+  Future<void> _calculateDeliveryForSelectedAddress() async {
+    if (selectedAddress == null) return;
+
+    setState(() {
+      isLocationLoading = true;
+    });
+
+    try {
+      final String fullAddress =
+          "${selectedAddress!['address']}, ${selectedAddress!['city']}, ${selectedAddress!['state']} ${selectedAddress!['pincode']}";
+
+      final latLng = await _getLatLngFromAddress(fullAddress);
+
+      if (latLng != null) {
+        double distanceKm = await _getDistanceKm(
+          warehouseLat,
+          warehouseLng,
+          latLng[0],
+          latLng[1],
+        );
+        print(distanceKm);
+        setState(() {
+          currentAddress = fullAddress;
+          delivery = _calculateDeliveryCharge(distanceKm);
+          _calculateTotals();
+          isLocationLoading = false;
+        });
+      } else {
+        setState(() {
+          currentAddress = "Failed to locate map address";
+          isLocationLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Map Geocoding error: $e");
+      setState(() {
+        currentAddress = "Map Geocoding failed";
+        isLocationLoading = false;
+      });
+    }
+  }
+
   Future<void> fetchCart() async {
     try {
       final user = home.storage.getUser();
@@ -45,11 +158,10 @@ class _CartScreenState extends State<CartScreen> {
           productlist = List<Map<String, dynamic>>.from(
             response["data"]["items"],
           );
-          totalamt = response["data"]["subtotal"];
+          totalamt = (response["data"]["subtotal"] as num).toDouble();
           print(totalamt);
-          gst = applyGST(totalamt);
 
-          finalprice = totalamt + gst + delivery;
+          _calculateTotals();
           isLoading = false;
         });
       } else {
@@ -63,6 +175,163 @@ class _CartScreenState extends State<CartScreen> {
         isLoading = false;
       });
     }
+  }
+
+  void _showAddressSelectionModal() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Select Delivery Address",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Get.back(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.4,
+                ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: userAddresses.length,
+                  itemBuilder: (context, index) {
+                    final addr = userAddresses[index];
+                    final full =
+                        "${addr['address']}, ${addr['city']}, ${addr['state']} ${addr['pincode']}";
+                    final isSelected =
+                        selectedAddress != null &&
+                        selectedAddress!['id'] == addr['id'];
+
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        isSelected
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_unchecked,
+                        color: isSelected
+                            ? const Color(0xff6a7bd1)
+                            : Colors.grey,
+                      ),
+                      title: Text(
+                        addr['full_name'] ?? 'Address',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(full),
+                      onTap: () {
+                        setState(() {
+                          selectedAddress = addr;
+                        });
+                        Get.back();
+                        _calculateDeliveryForSelectedAddress();
+                      },
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    Get.back();
+                    final res = await Get.to(() => const AddAddressScreen());
+                    if (res == true) {
+                      _getUserAddresses();
+                    }
+                  },
+                  icon: const Icon(Icons.add, color: Color(0xff6a7bd1)),
+                  label: const Text(
+                    "Add New Address",
+                    style: TextStyle(color: Color(0xff6a7bd1)),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    side: const BorderSide(color: Color(0xff6a7bd1)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<double> _getDistanceKm(
+    double originLat,
+    double originLng,
+    double destLat,
+    double destLng,
+  ) async {
+    try {
+      final url =
+          "https://maps.googleapis.com/maps/api/distancematrix/json?origins=$originLat,$originLng&destinations=$destLat,$destLng&key=$googleMapsApiKey";
+      final response = await Dio().get(url);
+      final data = response.data;
+
+      if (data['status'] == 'OK' &&
+          data['rows'][0]['elements'][0]['status'] == 'OK') {
+        final distanceMeters =
+            data['rows'][0]['elements'][0]['distance']['value'];
+        return distanceMeters / 1000.0;
+      }
+    } catch (e) {
+      print("Distance Matrix Error: $e");
+    }
+    return 0.0;
+  }
+
+  int _calculateDeliveryCharge(double distanceKm) {
+    if (distanceKm <= 5)
+      return 29;
+    else if (distanceKm <= 10)
+      return 49;
+    else if (distanceKm <= 20)
+      return 69;
+    else if (distanceKm <= 30)
+      return 89;
+    else if (distanceKm <= 50)
+      return 109;
+    else if (distanceKm <= 75)
+      return 139;
+    else if (distanceKm <= 100)
+      return 169;
+    else if (distanceKm <= 150)
+      return 209;
+    else if (distanceKm <= 200)
+      return 249;
+    else if (distanceKm <= 300)
+      return 349;
+    else if (distanceKm <= 500)
+      return 499;
+    else if (distanceKm <= 800)
+      return 699;
+    else
+      return 999; // ultra long distance
   }
 
   // final List<Map<String, dynamic>> productlist = [
@@ -191,16 +460,105 @@ class _CartScreenState extends State<CartScreen> {
                                 ],
                               ),
 
-                              const SizedBox(height: 30),
+                              const SizedBox(height: 20),
+
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(
+                                    Icons.location_on,
+                                    color: Colors.white70,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (userAddresses.isEmpty &&
+                                            !isLocationLoading)
+                                          ElevatedButton(
+                                            onPressed: () async {
+                                              final res = await Get.to(
+                                                () => const AddAddressScreen(),
+                                              );
+                                              if (res == true) {
+                                                _getUserAddresses();
+                                              }
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.orange,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 16,
+                                                    vertical: 8,
+                                                  ),
+                                            ),
+                                            child: const Text(
+                                              "Add Delivery Address",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          )
+                                        else
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                isLocationLoading
+                                                    ? "Calculating delivery route..."
+                                                    : currentAddress,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              GestureDetector(
+                                                onTap:
+                                                    _showAddressSelectionModal,
+                                                child: Text(
+                                                  "Change Address",
+                                                  style: TextStyle(
+                                                    color: Colors.orange,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 20),
 
                               /// PRICE ROWS
-                              _priceRow("Rental Subtotal:", "₹${totalamt}"),
+                              _priceRow("All Product Price :", "₹${totalamt}"),
                               const SizedBox(height: 12),
+                              _priceRow("Tax (18% GST) :", "₹${gst}"),
+                              const SizedBox(height: 5),
+                              const Divider(color: Colors.white54),
+                              const SizedBox(height: 5),
+                              _priceRow(
+                                "After add the gst :",
+                                "₹${totalamt + gst}",
+                              ),
+                              const SizedBox(height: 5),
+                              const Divider(color: Colors.white54),
+                              const SizedBox(height: 5),
 
-                              _priceRow("Delivery Charge:", "₹99.00"),
+                              _priceRow(
+                                "Delivery Charge no GST apply:",
+                                "+ ₹$delivery",
+                              ),
                               const SizedBox(height: 12),
-
-                              _priceRow("Tax (18% GST):", "₹${gst}"),
 
                               const SizedBox(height: 20),
 
@@ -214,7 +572,7 @@ class _CartScreenState extends State<CartScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "Total Payable:",
+                                    "Total Payable For 1 day :",
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
@@ -240,7 +598,14 @@ class _CartScreenState extends State<CartScreen> {
                                 height: 50,
                                 child: ElevatedButton.icon(
                                   onPressed: () {
-                                    Get.toNamed("/checkout");
+                                    Get.toNamed(
+                                      "/checkout",
+                                      arguments: {
+                                        "address": currentAddress,
+                                        "subtotalWithGst": totalamt + gst,
+                                        "delivery": delivery,
+                                      },
+                                    );
                                   },
                                   icon: const Icon(Icons.credit_card),
                                   label: const Text(
