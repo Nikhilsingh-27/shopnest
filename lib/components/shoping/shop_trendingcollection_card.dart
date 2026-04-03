@@ -8,11 +8,12 @@ class TrendingcollectionCard extends StatelessWidget {
   final Map<String, dynamic> item;
 
   const TrendingcollectionCard({super.key, required this.item});
-
+  // print(item["description"]);
   /// 🚀 FETCH PRODUCT BY ID
   Future<void> handleViewDetails() async {
     final productId = item["id"]?.toString();
-
+    print(item["id"]);
+    print(item["description"]);
     if (productId == null || productId.isEmpty) {
       CustomSnackbar.showError("Product ID missing");
       return;
@@ -109,15 +110,36 @@ class TrendingcollectionCard extends StatelessWidget {
                   const SizedBox(height: 8),
 
                   /// 💰 RENT
+                  // Row(
+                  //   children: [
+                  //     const Text(
+                  //       "Original Price:",
+                  //       style: TextStyle(fontSize: 14, color: Colors.black54),
+                  //     ),
+                  //     const SizedBox(width: 6),
+                  //     Text(
+                  //       "₹${item["original_price"] ?? 0}",
+                  //       style: const TextStyle(
+                  //         fontSize: 16,
+                  //         color: Colors.blue,
+                  //         fontWeight: FontWeight.w600,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+
+                  //const SizedBox(height: 10),
+
+                  //
                   Row(
                     children: [
                       const Text(
-                        "Original Price:",
+                        "MRP :",
                         style: TextStyle(fontSize: 14, color: Colors.black54),
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        "₹${item["original_price"] ?? 0}",
+                        "₹${item["market_price"] ?? 0}",
                         style: const TextStyle(
                           fontSize: 16,
                           color: Colors.blue,
@@ -127,8 +149,31 @@ class TrendingcollectionCard extends StatelessWidget {
                     ],
                   ),
 
-                  // const SizedBox(height: 10),
-                  //
+                  const SizedBox(height: 8),
+
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Description :",
+                        style: TextStyle(fontSize: 14, color: Colors.black54),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        // 🔥 important to prevent overflow
+                        child: Text(
+                          "${item["description"] ?? ""}",
+                          maxLines: 3, // ✅ only 3 lines
+                          overflow: TextOverflow.ellipsis, // ✅ show ...
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.blue,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   // /// 🔥 DISCOUNT
                   // if ((item["discount"] ?? 0) > 0)
                   //   Container(

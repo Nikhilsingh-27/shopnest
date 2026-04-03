@@ -80,6 +80,8 @@ class _TrendingcollectionSectionState extends State<TrendingcollectionSection> {
                 "category_id": product["category_id"],
                 "category_name": product["category_name"],
                 "original_price": product["original_price"],
+                "market_price": product["market_price"],
+                "description": product["description"],
                 // Add any other fields needed for SingleproductScreen
               },
             ),

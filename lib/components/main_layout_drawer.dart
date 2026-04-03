@@ -204,8 +204,7 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
                         Padding(
                           padding: const EdgeInsets.all(14),
                           child: Row(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.center, // center vertically
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               /// UNVERIFIED BADGE
                               Container(
