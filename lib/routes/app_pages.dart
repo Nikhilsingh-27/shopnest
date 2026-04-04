@@ -14,6 +14,7 @@ import 'package:shopnest/screens/shipping_policy_screen.dart';
 import 'package:shopnest/screens/signup.dart';
 import 'package:shopnest/screens/terms_conditions_screen.dart';
 import 'package:shopnest/screens/verification_screen.dart';
+import 'package:shopnest/screens/Inuse_screen.dart';
 
 // import '../screens/rent_screen.dart';
 // import '../screens/categories_screen.dart';
@@ -58,5 +59,6 @@ class AppPages {
     GetPage(name: Routes.faq, page: () => const FAQScreen()),
 
     GetPage(name: Routes.shopping, page: () => ShopHomescreen()),
+    GetPage(name: Routes.inuse, page: () => const InuseScreen()),
   ];
 }

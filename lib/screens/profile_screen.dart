@@ -1486,6 +1486,7 @@ class _RentalFilterButtonsState extends State<RentalFilterButtons> {
                 () => RentalDetailsScreen(
                   items: List<Map<String, dynamic>>.from(rental["items"]),
                   orderId: rental["id"].toString(),
+                  totalPrice: rental["total_price"].toString(),
                 ),
               );
             },

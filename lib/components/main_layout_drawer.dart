@@ -105,6 +105,7 @@ class _AppEndDrawerState extends State<AppEndDrawer> {
               _menuItem(Icons.checkroom, "Rent Clothes", "/rentclothes"),
               _menuItem(Icons.local_offer, "Categories", "/categories"),
               _menuItem(Icons.shopping_cart, "Cart", "/cart"),
+              _menuItem(Icons.shopping_cart, "In-Use Order Status", "/inuse"),
               if (user == null) ...[
                 _menuItem(Icons.login, "Login", "/login"),
 

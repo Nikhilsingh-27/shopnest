@@ -21,4 +21,5 @@ abstract class Routes {
   static const chekout = '/checkout';
 
   static const shopping = "/shopping";
+  static const inuse = "/inuse";
 }

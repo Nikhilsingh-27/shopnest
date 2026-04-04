@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shopnest/components/main_layout_drawer.dart';
 import 'package:shopnest/components/shopfooter_section.dart';
@@ -5,11 +6,13 @@ import 'package:shopnest/components/shopfooter_section.dart';
 class RentalDetailsScreen extends StatelessWidget {
   final List<Map<String, dynamic>> items;
   final String orderId;
+  final String totalPrice;
 
   const RentalDetailsScreen({
     super.key,
     required this.items,
     required this.orderId,
+    required this.totalPrice,
   });
 
   String getImageUrl(String? imageName) {
@@ -18,7 +21,22 @@ class RentalDetailsScreen extends StatelessWidget {
 
     if (imageName == null || imageName.trim().isEmpty) return defaultImage;
 
-    final imageFile = imageName.split('/').last;
+    // Handle JSON stringified arrays like ["image.jpg"]
+    String imageFile = "";
+    if (imageName.startsWith("[") && imageName.endsWith("]")) {
+      try {
+        final List<dynamic> images = jsonDecode(imageName);
+        if (images.isNotEmpty) {
+          imageFile = images[0].toString();
+        }
+      } catch (e) {
+        // Fallback to simple split if decode fails
+        imageFile = imageName.split('/').last;
+      }
+    } else {
+      imageFile = imageName.split('/').last;
+    }
+
     if (imageFile.isEmpty) return defaultImage;
 
     return "${baseUrl}demo/shopnest/assets/images/products/$imageFile";
@@ -179,7 +197,7 @@ class RentalDetailsScreen extends StatelessWidget {
                               const SizedBox(height: 8),
                               _buildPriceRow(
                                 "Total Price",
-                                "₹${getTotalPrice().toStringAsFixed(2)}",
+                                "₹$totalPrice",
                                 isBold: true,
                               ),
                             ],
